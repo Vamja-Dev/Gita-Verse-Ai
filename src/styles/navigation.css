@@ -1,0 +1,20 @@
+.glass-panel {
+  background: rgba(26, 15, 8, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-left: 1px solid rgba(217, 119, 6, 0.3);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.9);
+}
+
+.menu-item-hover:hover {
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.15) 0%, transparent 100%);
+  border-left: 3px solid #f59e0b;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,20 @@
+export const chaptersData = [
+  { number: 1, englishName: "Arjuna Visada Yoga", sanskritName: "अर्जुनविषादयोग", verses_count: 47 },
+  { number: 2, englishName: "Sankhya Yoga", sanskritName: "सांख्ययोग", verses_count: 72 },
+  { number: 3, englishName: "Karma Yoga", sanskritName: "कर्मयोग", verses_count: 43 },
+  { number: 4, englishName: "Jnana Karma Sanyasa Yoga", sanskritName: "ज्ञानकर्मसंन्यासयोग", verses_count: 42 },
+  { number: 5, englishName: "Karma Sanyasa Yoga", sanskritName: "कर्मसंन्यासयोग", verses_count: 29 },
+  { number: 6, englishName: "Dhyana Yoga", sanskritName: "ध्यानयोग", verses_count: 47 },
+  { number: 7, englishName: "Jnana Vijnana Yoga", sanskritName: "ज्ञानविज्ञानयोग", verses_count: 30 },
+  { number: 8, englishName: "Akshara Brahma Yoga", sanskritName: "अक्षरब्रह्मयोग", verses_count: 28 },
+  { number: 9, englishName: "Raja Vidya Raja Guhya Yoga", sanskritName: "राजविद्याराजगुह्ययोग", verses_count: 34 },
+  { number: 10, englishName: "Vibhuti Yoga", sanskritName: "विभूतियोग", verses_count: 42 },
+  { number: 11, englishName: "Visvarupa Darsana Yoga", sanskritName: "विश्वरूपदर्शनयोग", verses_count: 55 },
+  { number: 12, englishName: "Bhakti Yoga", sanskritName: "भक्तियोग", verses_count: 20 },
+  { number: 13, englishName: "Kshetra Kshetragna Vibhaga Yoga", sanskritName: "क्षेत्रक्षेत्रज्ञविभागयोग", verses_count: 35 },
+  { number: 14, englishName: "Gunatraya Vibhaga Yoga", sanskritName: "गुणत्रयविभागयोग", verses_count: 27 },
+  { number: 15, englishName: "Purushottama Yoga", sanskritName: "पुरुषोत्तमयोग", verses_count: 20 },
+  { number: 16, englishName: "Daivasura Sampad Vibhaga Yoga", sanskritName: "दैवासुरसम्पद्विभागयोग", verses_count: 24 },
+  { number: 17, englishName: "Sraddhatraya Vibhaga Yoga", sanskritName: "श्रद्धात्रयविभागयोग", verses_count: 28 },
+  { number: 18, englishName: "Moksha Sanyasa Yoga", sanskritName: "मोक्षसंन्यासयोग", verses_count: 78 }
+];
