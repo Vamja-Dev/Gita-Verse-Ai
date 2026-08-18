@@ -1,18 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Globe, Compass, Cpu, Book, Brain, Zap, ShieldCheck } from 'lucide-react';
+import { Sparkles, Globe, Compass, Cpu, Book, Brain, Zap, ShieldCheck, LogIn } from 'lucide-react';
 import { FaYoutube, FaInstagram, FaFacebook, FaLinkedin, FaDiscord, FaXTwitter } from "react-icons/fa6";
 import aboutBg from '../assets/images/about-bg.png';
 
 export default function About({ onNavigate }) {
-  // Social links configuration
+  // Social links configuration with direct login/community URLs
   const socialLinks = [
-    { name: 'YouTube', icon: <FaYoutube className="text-red-500 text-lg" />, url: '#' },
-    { name: 'Instagram', icon: <FaInstagram className="text-pink-500 text-lg" />, url: '#' },
-    { name: 'Facebook', icon: <FaFacebook className="text-blue-500 text-lg" />, url: '#' },
-    { name: 'X (Twitter)', icon: <FaXTwitter className="text-slate-100 text-lg" />, url: '#' },
-    { name: 'LinkedIn', icon: <FaLinkedin className="text-blue-400 text-lg" />, url: '#' },
-    { name: 'Discord', icon: <FaDiscord className="text-indigo-400 text-lg" />, url: '#' },
+    { name: 'YouTube', icon: <FaYoutube className="text-red-500 text-lg" />, url: 'https://www.youtube.com/login' },
+    { name: 'Instagram', icon: <FaInstagram className="text-pink-500 text-lg" />, url: 'https://www.instagram.com/accounts/login/' },
+    { name: 'Facebook', icon: <FaFacebook className="text-blue-500 text-lg" />, url: 'https://www.facebook.com/login/' },
+    { name: 'X (Twitter)', icon: <FaXTwitter className="text-slate-100 text-lg" />, url: 'https://x.com/i/flow/login' },
+    { name: 'LinkedIn', icon: <FaLinkedin className="text-blue-400 text-lg" />, url: 'https://www.linkedin.com/login' },
+    { name: 'Discord', icon: <FaDiscord className="text-indigo-400 text-lg" />, url: 'https://discord.com/login' },
   ];
 
   return (
@@ -101,17 +101,33 @@ export default function About({ onNavigate }) {
             </ul>
           </div>
 
-          {/* Social Media Connection Section */}
-          <div className="space-y-4 pt-4 border-t border-amber-500/20">
-            <h3 className="text-xl font-serif text-amber-200 flex items-center gap-2.5">
-              <Globe className="w-5 h-5 text-amber-400" />
-              Connect With Our Community
-            </h3>
+          {/* Social Media Connection & Login Section */}
+          <div className="space-y-6 pt-4 border-t border-amber-500/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <h3 className="text-xl font-serif text-amber-200 flex items-center gap-2.5">
+                <Globe className="w-5 h-5 text-amber-400" />
+                Connect With Our Community
+              </h3>
+              
+              {/* Account Login Link / Button */}
+              <motion.button
+                onClick={() => onNavigate ? onNavigate('login') : window.location.href = '/login'}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-sans font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] cursor-pointer transition-all"
+              >
+                <LogIn size={15} />
+                <span>Account Login</span>
+              </motion.button>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2">
               {socialLinks.map((social, idx) => (
                 <motion.a
                   key={idx}
                   href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.05, borderColor: 'rgba(245, 158, 11, 0.8)' }}
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#06040a]/70 border border-amber-500/30 text-amber-100 hover:text-amber-400 font-sans text-xs tracking-wider uppercase transition-colors shadow-lg cursor-pointer"
