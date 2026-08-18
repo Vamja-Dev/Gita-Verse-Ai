@@ -1,23 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Globe, Compass, Cpu } from 'lucide-react';
+import { Sparkles, Globe, Compass, Cpu, Book, Brain, Zap, ShieldCheck } from 'lucide-react';
 import { FaYoutube, FaInstagram, FaFacebook, FaLinkedin, FaDiscord, FaXTwitter } from "react-icons/fa6";
 import aboutBg from '../assets/images/about-bg.png';
 
 export default function About({ onNavigate }) {
-  // Social links configuration with direct login URLs and brand icons
+  // Social links configuration
   const socialLinks = [
-    { name: 'YouTube', icon: <FaYoutube className="text-red-500 text-lg" />, url: 'https://www.youtube.com/login' },
-    { name: 'Instagram', icon: <FaInstagram className="text-pink-500 text-lg" />, url: 'https://www.instagram.com/accounts/login/?hl=en' },
-    { name: 'Facebook', icon: <FaFacebook className="text-blue-500 text-lg" />, url: 'https://www.facebook.com/login/' },
-    { name: 'X (Twitter)', icon: <FaXTwitter className="text-slate-100 text-lg" />, url: 'https://x.com/i/flow/login' },
-    { name: 'LinkedIn', icon: <FaLinkedin className="text-blue-400 text-lg" />, url: 'https://www.linkedin.com/login' },
-    { name: 'Discord', icon: <FaDiscord className="text-indigo-400 text-lg" />, url: 'https://discord.com/login' },
+    { name: 'YouTube', icon: <FaYoutube className="text-red-500 text-lg" />, url: '#' },
+    { name: 'Instagram', icon: <FaInstagram className="text-pink-500 text-lg" />, url: '#' },
+    { name: 'Facebook', icon: <FaFacebook className="text-blue-500 text-lg" />, url: '#' },
+    { name: 'X (Twitter)', icon: <FaXTwitter className="text-slate-100 text-lg" />, url: '#' },
+    { name: 'LinkedIn', icon: <FaLinkedin className="text-blue-400 text-lg" />, url: '#' },
+    { name: 'Discord', icon: <FaDiscord className="text-indigo-400 text-lg" />, url: '#' },
   ];
 
   return (
-    <main 
-      className="relative w-full min-h-screen text-slate-100 font-serif px-6 md:px-16 pt-24 pb-24 overflow-x-hidden flex flex-col items-center"
+    <div 
+      className="relative w-full min-h-screen text-slate-100 font-serif flex flex-col justify-between overflow-x-hidden"
       style={{
         backgroundColor: '#06040a',
         backgroundImage: `linear-gradient(rgba(6, 4, 10, 0.75), rgba(6, 4, 10, 0.85)), url(${aboutBg})`,
@@ -29,7 +29,8 @@ export default function About({ onNavigate }) {
       {/* Ambient background lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-20 w-full max-w-4xl mx-auto space-y-12">
+      {/* Main Content Area */}
+      <main className="relative z-20 w-full max-w-4xl mx-auto px-6 md:px-16 pt-24 pb-16 space-y-12">
         
         {/* Header Title Section */}
         <div className="text-center space-y-4 pt-12">
@@ -59,24 +60,43 @@ export default function About({ onNavigate }) {
             </p>
           </div>
 
-          {/* Features Section */}
+          {/* How It Works Section */}
           <div className="space-y-4">
             <h3 className="text-2xl font-serif text-amber-200 flex items-center gap-2.5">
               <Cpu className="w-6 h-6 text-amber-400" />
-              Platform Architecture & Features
+              Intelligence & Technology
             </h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-              <li className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 px-4 py-3 rounded-2xl text-xs md:text-sm font-sans text-slate-200">
-                <span className="text-amber-400">✦</span> 701+ Interactive Shloka Verses
+            <p className="text-sm md:text-base font-sans text-slate-300/90 leading-relaxed font-light">
+              We have synthesized thousands of years of Vedic philosophy into an intuitive digital experience. By combining advanced AI models with verified scriptural databases, our platform serves as a modern charioteer, guiding you through complex life decisions with the light of ancient knowledge.
+            </p>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <li className="flex gap-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <Book className="text-amber-500 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-amber-200 text-sm">Scriptural Knowledge</h4>
+                  <p className="text-xs text-slate-400">Deep access to Gita shlokas, translations, and real-life practical applications.</p>
+                </div>
               </li>
-              <li className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 px-4 py-3 rounded-2xl text-xs md:text-sm font-sans text-slate-200">
-                <span className="text-amber-400">✦</span> Personalized User Bookmarks
+              <li className="flex gap-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <Brain className="text-amber-500 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-amber-200 text-sm">Interactive AI Guidance</h4>
+                  <p className="text-xs text-slate-400">Personalized insights that help you understand Dharma in your daily modern life.</p>
+                </div>
               </li>
-              <li className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 px-4 py-3 rounded-2xl text-xs md:text-sm font-sans text-slate-200">
-                <span className="text-amber-400">✦</span> Four Vedas & Yuga Chronicles
+              <li className="flex gap-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <Zap className="text-amber-500 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-amber-200 text-sm">Immersive Experience</h4>
+                  <p className="text-xs text-slate-400">Audio recitations, meditative environments, and cosmic timelines to center your focus.</p>
+                </div>
               </li>
-              <li className="flex items-center gap-3 bg-amber-500/5 border border-amber-500/20 px-4 py-3 rounded-2xl text-xs md:text-sm font-sans text-slate-200">
-                <span className="text-amber-400">✦</span> Immersive Meditation Audio
+              <li className="flex gap-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <ShieldCheck className="text-amber-500 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-amber-200 text-sm">Authentic & Secure</h4>
+                  <p className="text-xs text-slate-400">Strictly grounded in authentic Vedic translations with a secure, private, distraction-free environment.</p>
+                </div>
               </li>
             </ul>
           </div>
@@ -92,8 +112,6 @@ export default function About({ onNavigate }) {
                 <motion.a
                   key={idx}
                   href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.05, borderColor: 'rgba(245, 158, 11, 0.8)' }}
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-[#06040a]/70 border border-amber-500/30 text-amber-100 hover:text-amber-400 font-sans text-xs tracking-wider uppercase transition-colors shadow-lg cursor-pointer"
@@ -105,11 +123,12 @@ export default function About({ onNavigate }) {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/80 backdrop-blur-md border-t border-amber-500/10 w-full mt-24">
+      {/* Full-width sticky footer pinned to the absolute bottom */}
+      <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950 backdrop-blur-md border-t border-amber-500/10 w-full mt-auto">
         © 2026 GitaVerse AI. All rights reserved.
       </footer>
-    </main>
+    </div>
   );
 }
