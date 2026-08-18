@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -36,22 +37,36 @@ class LLMService:
             "Write a unique spiritual connection explaining how this teaching addresses the user's situation."
         )
 
-        if self.provider == "gemini" and self.gemini_api_key and self.gemini_api_key != "your_actual_gemini_api_key_here":
-            try:
-                response = self.client.models.generate_content(
-                    model='gemini-3.5-flash',
-                    contents=user_prompt,
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_instructions,
-                        temperature=0.7
-                    )
-                )
-                if response and response.text:
-                    return response.text.strip()
-            except Exception as e:
-                print(f"Gemini API connection exception: {e}")
+        response = None
 
-        # Fallback if API key is missing or request fails
+        if self.provider == "gemini" and self.gemini_api_key and self.gemini_api_key != "your_actual_gemini_api_key_here":
+            max_retries = 3
+            backoff_delay = 2
+
+            for attempt in range(max_retries):
+                try:
+                    response = self.client.models.generate_content(
+                        model='gemini-3.6-flash',
+                        contents=user_prompt,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instructions,
+                            temperature=0.7
+                        )
+                    )
+                    if response and response.text:
+                        break
+                except Exception as e:
+                    print(f"Gemini API connection exception on attempt {attempt + 1}: {e}")
+                    if attempt < max_retries - 1:
+                        time.sleep(backoff_delay)
+                        backoff_delay *= 2
+                    else:
+                        print("All retry attempts failed. Falling back to local response.")
+
+            if response and response.text:
+                return response.text.strip()
+
+        # Fallback if API key is missing or request/retries fail
         return (
             f"In your situation, this teaching from Chapter {primary_shloka.get('chapter')}, Verse {primary_shloka.get('shloka_number')} "
             f"reminds us to look inward: \"{translation[:120]}...\" — guiding you to anchor your mind in clarity."

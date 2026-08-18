@@ -40,9 +40,31 @@ export default function DailyWisdomCard() {
     }
   }, []);
 
-  const handleShare = () => {
-    if (!randomShloka) return;
-    navigator.clipboard.writeText(`"${randomShloka.sanskrit}" - Bhagavad Gita (${randomShloka.chapterLabel}): ${randomShloka.translation}`);
+  const handleShare = async () => {
+    if (!randomShloka && !wisdom) return;
+    const currentWisdom = randomShloka || wisdom;
+    
+    const shareText = `🙏 Bhagavad Gita (${currentWisdom.chapterLabel}) 🙏\n\n"${currentWisdom.sanskrit}"\n\nTranslation:\n"${currentWisdom.translation}"\n\nInsight:\n${currentWisdom.explanation}\n\nExplore more on GitaVerse AI ✨`;
+
+    // Use Web Share API if available (opens native mobile or browser share menu for WhatsApp, Gmail, Facebook, etc.)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Daily Divine Wisdom - GitaVerse AI',
+          text: shareText,
+        });
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.log("Web share fallback to clipboard:", err);
+        } else {
+          return;
+        }
+      }
+    }
+
+    // Fallback copy to clipboard if Web Share API is unsupported
+    navigator.clipboard.writeText(shareText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -94,6 +116,7 @@ export default function DailyWisdomCard() {
             <span className="text-xs font-serif text-amber-200/90 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
               {wisdom.chapterLabel}
             </span>
+
           </div>
 
           {/* Sanskrit Shloka */}
@@ -103,7 +126,7 @@ export default function DailyWisdomCard() {
             </h3>
           </div>
 
-          {/* Action Row: Real Audio Player Component (Left), Unveil Button (Center), Share Button (Right) */}
+          {/* Action Row: Real Audio Player Component (Left), Unveil Button (Center), Share Button (Right with identical sizing, padding, and styling to GitaAudioPlayer) */}
           <div className="flex items-center justify-center gap-3 mt-6 flex-wrap">
             
             {/* Real Audio Recitation Player Button using your exact extracted audio files */}
@@ -121,19 +144,19 @@ export default function DailyWisdomCard() {
               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </motion.button>
 
-            {/* Share / Copy Button */}
+            {/* Share / Universal System Share Button styled with identical padding (p-2.5), rounded-xl, borders, and colors to GitaAudioPlayer */}
             <motion.button
               onClick={handleShare}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-center shadow-lg ${
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer shadow ${
                 copied 
                   ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.6)]' 
-                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+                  : 'bg-[#faebd7] border-[#8c5a3c]/50 text-[#3d2314] hover:bg-[#ecd0a8]'
               }`}
               title={copied ? "Copied to Clipboard!" : "Share Wisdom"}
             >
-              {copied ? <Check size={18} /> : <Share2 size={18} />}
+              {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
             </motion.button>
 
           </div>

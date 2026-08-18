@@ -21,10 +21,6 @@ export default function GitaChat() {
       <div className="relative z-20 max-w-5xl mx-auto px-6 pt-0 space-y-10">
         <Hero />
       </div>
-
-      <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/60 backdrop-blur-md border-t border-amber-500/10 mt-20">
-        © 2026 GitaVerse AI. All rights reserved.
-      </footer>
     </motion.div>
   );
 }
