@@ -22,7 +22,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         onBack();
     };
 
-    // Helper to close modal, stop audio, and return directly to the dashboard if opened from there
     // Helper to close modal, stop audio, and return directly to the dashboard
     const handleCloseModal = () => {
         stopGlobalAudio();
@@ -31,9 +30,8 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         const openedFromDashboard = localStorage.getItem('gitaverse_opened_from_dashboard');
         if (openedFromDashboard === 'true') {
             localStorage.removeItem('gitaverse_opened_from_dashboard');
-            // Directly trigger your app router to go to the dashboard view
             if (onNavigate) {
-                onNavigate('dashboard'); // Change 'dashboard' to whatever route name your app uses for UserDashboard
+                onNavigate('dashboard');
             }
         }
     };
@@ -170,8 +168,13 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                     boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9), inset 0 0 60px rgba(120, 80, 40, 0.3)'
                 }}
             >
-                {/* Chapter Title Banner on Parchment */}
-                <div className="text-center mb-10 space-y-3 border-b-2 border-[#8c5a3c]/30 pb-6">
+                {/* Chapter Title Banner on Parchment with Total Shlokas Count Badge */}
+                <div className="relative text-center mb-10 space-y-3 border-b-2 border-[#8c5a3c]/30 pb-6">
+                    {/* Total Shlokas Badge positioned in the top-right area */}
+                    <div className="absolute top-0 right-0 px-3.5 py-1.5 rounded-xl bg-[#3d2314] border border-amber-500/40 text-amber-200 text-xs font-sans font-bold shadow-md tracking-wider">
+                        {chapterInfo.verses_count || verses.length} Shlokas
+                    </div>
+
                     <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#3d2314] text-amber-200 border border-amber-600/40 font-sans shadow">
                         Chapter {chapterNumber}
                     </span>
@@ -250,7 +253,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
             <AnimatePresence>
                 {selectedShloka && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
-                        {/* Dark Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -259,7 +261,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                             className="absolute inset-0 bg-slate-950/85 backdrop-blur-md"
                         />
 
-                        {/* Scroll Wrapper Container */}
                         <motion.div
                             initial={{ scaleY: 0, opacity: 0 }}
                             animate={{ scaleY: 1, opacity: 1 }}
@@ -268,7 +269,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                             style={{ transformOrigin: 'center' }}
                             className="relative z-10 w-full max-w-3xl my-auto flex flex-col items-center py-12"
                         >
-                            {/* TOP 3D WIDE WOODEN ROLLER */}
                             <div className="relative -mb-3 h-14 md:h-16 bg-gradient-to-b from-[#2d1508] via-[#8c5a3c] to-[#1a0c04] border-2 border-[#0a0401] rounded-full shadow-[0_15px_30px_rgba(0,0,0,0.95)] flex justify-between items-center z-30 px-3 w-[calc(100%+5rem)] md:w-[calc(100%+7rem)]">
                                 <div className="flex items-center -ml-8 md:-ml-10 pointer-events-none">
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-l border border-black" />
@@ -281,7 +281,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                 </div>
                             </div>
 
-                            {/* PARCHMENT SHEET CONTENT */}
                             <div
                                 className="relative z-20 w-full px-8 md:px-16 py-10 space-y-6 font-serif shadow-2xl rounded-sm overflow-y-auto scrollbar-none max-h-[75vh]"
                                 style={{
@@ -307,7 +306,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                         </h3>
                                     </div>
 
-                                    {/* Header action buttons container */}
                                     <div className="flex flex-col items-end gap-2 pr-12 md:pr-0">
                                         <button
                                             onClick={(e) => handleToggleSaveShloka(selectedShloka, e)}
@@ -384,7 +382,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                 </div>
                             </div>
 
-                            {/* BOTTOM 3D WIDE WOODEN ROLLER */}
                             <div className="relative -mt-3 h-14 md:h-16 bg-gradient-to-t from-[#2d1508] via-[#8c5a3c] to-[#1a0c04] border-2 border-[#0a0401] rounded-full shadow-[0_-15px_30px_rgba(0,0,0,0.95)] flex justify-between items-center z-30 px-2 w-[calc(100%+5rem)] md:w-[calc(100%+7rem)]">
                                 <div className="flex items-center -ml-8 md:-ml-10 pointer-events-none">
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-l border border-black" />

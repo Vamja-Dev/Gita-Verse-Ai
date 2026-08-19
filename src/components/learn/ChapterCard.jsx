@@ -32,7 +32,7 @@ export default function ChapterCard({ chapter, onClick }) {
           Chapter {chapterId}
         </span>
         <span className="text-xs font-serif text-amber-200/80 italic">
-          {chapter.verses_count || chapter.totalShlokas || 40} Verses
+          {chapter.verses_count || chapter.totalShlokas || 40} Shlokas
         </span>
       </div>
       
