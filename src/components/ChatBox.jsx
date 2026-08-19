@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPaperPlane, FaMicrophone, FaSpinner, FaChevronRight, FaChevronDown } from 'react-icons/fa';
+import { FaPaperPlane, FaMicrophone, FaStop, FaSpinner, FaChevronRight, FaChevronDown } from 'react-icons/fa';
 
 export default function ChatBox({ onSend }) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [responseResult, setResponseResult] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+
+  // Speech recognition ref
+  const recognitionRef = useRef(null);
 
   // Collapsible dropdown states for translations & explanations
   const [showTransEnglish, setShowTransEnglish] = useState(false);
@@ -18,10 +22,67 @@ export default function ChatBox({ onSend }) {
 
   const textareaRef = useRef(null);
 
+  // Initialize browser speech recognition on mount
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US'; // Change to 'hi-IN' if you prefer speaking in Hindi
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInput(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleListening = () => {
+    // Prevent starting speech recognition while loading/processing response
+    if (isLoading) return;
+
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.log("Recognition already active", err);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userQuery = input.trim();
     if (!userQuery || isLoading) return;
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
 
     setInput('');
     setIsLoading(true);
@@ -68,10 +129,7 @@ export default function ChatBox({ onSend }) {
 
   return (
     <div className="w-full relative flex flex-col items-center">
-      {/* 
-        STATIONARY CHATBOX CONTAINER:
-        Kept in its exact layout position with zero vertical layout shifting.
-      */}
+      {/* STATIONARY CHATBOX CONTAINER */}
       <div className="w-full flex justify-center z-30">
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
@@ -99,23 +157,37 @@ export default function ChatBox({ onSend }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isLoading ? "Seeking guidance from the Gita..." : "Ask Krishna anything..."}
+              placeholder={isListening ? "Listening to your problem..." : "Ask Krishna anything..."}
               disabled={isLoading}
-              className="w-full bg-slate-950/20 border border-amber-500/30 rounded-xl py-3 px-4 pr-20 text-xs text-amber-100 placeholder-amber-200/40 focus:outline-none focus:border-amber-400/80 transition-all backdrop-blur-sm resize-none overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden min-h-[42px] max-h-[140px]"
+              className={`w-full bg-slate-950/20 border rounded-xl py-3 px-4 pr-20 text-xs text-amber-100 placeholder-amber-200/40 focus:outline-none transition-all backdrop-blur-sm resize-none overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden min-h-[42px] max-h-[140px] ${
+                isListening 
+                  ? 'border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.6)]' 
+                  : 'border-amber-500/30 focus:border-amber-400/80'
+              }`}
             />
 
             <div className="absolute right-2.5 flex items-center space-x-1.5">
+              {/* Voice / Mic / Stop Toggle Button (Disabled during loading) */}
               <button
                 type="button"
-                className="p-1 text-amber-200/50 hover:text-amber-400 transition-colors"
-                title="Voice Input"
+                onClick={toggleListening}
+                disabled={isLoading}
+                className={`p-2 rounded-lg transition-all flex items-center justify-center ${
+                  isLoading
+                    ? 'opacity-40 cursor-not-allowed bg-amber-500/10 border border-amber-500/20 text-amber-200/40'
+                    : isListening
+                      ? 'bg-amber-500 text-slate-950 border border-amber-300 animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.8)] cursor-pointer'
+                      : 'text-amber-200/60 hover:text-amber-400 bg-amber-500/10 border border-amber-500/20 cursor-pointer'
+                }`}
+                title={isLoading ? "Processing response..." : isListening ? "Stop Listening" : "Speak your problem"}
               >
-                <FaMicrophone className="w-3.5 h-3.5" />
+                {isListening ? <FaStop className="w-3 h-3" /> : <FaMicrophone className="w-3.5 h-3.5" />}
               </button>
+
               <button
                 type="submit"
                 disabled={isLoading}
-                className="p-2 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded-full hover:scale-105 transition-transform shadow-md disabled:opacity-50 flex items-center justify-center w-8 h-8 flex-shrink-0"
+                className="p-2 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 rounded-full hover:scale-105 transition-transform shadow-md disabled:opacity-50 flex items-center justify-center w-8 h-8 flex-shrink-0 cursor-pointer"
                 title="Send Message"
               >
                 {isLoading ? (
@@ -129,10 +201,7 @@ export default function ChatBox({ onSend }) {
         </motion.div>
       </div>
 
-      {/* --- ABSOLUTE RESPONSE CONTAINER --- 
-          Positioned below the chat box using absolute coordinates so the chat box container 
-          never moves up, down, or changes state when the response pops in.
-      */}
+      {/* --- ABSOLUTE RESPONSE CONTAINER --- */}
       <div className="absolute top-[170px] left-1/2 -translate-x-1/2 w-full max-w-5xl px-4 pb-24 z-20 pointer-events-none">
         <div className="pointer-events-auto">
           <AnimatePresence>
@@ -172,11 +241,10 @@ export default function ChatBox({ onSend }) {
                       <p className="text-amber-400 font-bold uppercase tracking-wider text-xs font-sans">Translations:</p>
                       
                       <div className="flex flex-col space-y-3">
-                        {/* English Translation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowTransEnglish(!showTransEnglish)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showTransEnglish ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}
@@ -190,11 +258,10 @@ export default function ChatBox({ onSend }) {
                           )}
                         </div>
 
-                        {/* Hindi Translation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowTransHindi(!showTransHindi)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showTransHindi ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}
@@ -208,11 +275,10 @@ export default function ChatBox({ onSend }) {
                           )}
                         </div>
 
-                        {/* Gujarati Translation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowTransGujarati(!showTransGujarati)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showTransGujarati ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}
@@ -233,11 +299,10 @@ export default function ChatBox({ onSend }) {
                       <p className="text-amber-400 font-bold uppercase tracking-wider text-xs font-sans">Explanations & Commentaries:</p>
                       
                       <div className="flex flex-col space-y-3">
-                        {/* English Explanation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowExpEnglish(!showExpEnglish)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showExpEnglish ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}
@@ -251,11 +316,10 @@ export default function ChatBox({ onSend }) {
                           )}
                         </div>
 
-                        {/* Hindi Explanation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowExpHindi(!showExpHindi)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showExpHindi ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}
@@ -269,11 +333,10 @@ export default function ChatBox({ onSend }) {
                           )}
                         </div>
 
-                        {/* Gujarati Explanation */}
                         <div className="border border-amber-500/20 rounded-xl overflow-hidden bg-black/30">
                           <button 
                             onClick={() => setShowExpGujarati(!showExpGujarati)}
-                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors"
+                            className="w-full flex items-center justify-between p-3 text-left text-amber-200 hover:bg-amber-500/10 font-semibold font-sans text-xs transition-colors cursor-pointer"
                           >
                             <span className="flex items-center gap-2">
                               {showExpGujarati ? <FaChevronDown className="w-3 h-3 text-amber-400" /> : <FaChevronRight className="w-3 h-3 text-amber-400" />}

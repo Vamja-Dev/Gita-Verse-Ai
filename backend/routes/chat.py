@@ -18,19 +18,52 @@ class ChatRequest(BaseModel):
     message: str
 
 def is_valid_life_problem(text: str) -> bool:
-    cleaned = text.strip()
+    cleaned = text.strip().lower()
     
-    # Reject short inputs (e.g. "hi", "ok")
+    # 1. Reject very short inputs (e.g., "hi", "ok", "2+2")
     if len(cleaned) < 4:
         return False
         
-    # Reject pure math equations, numbers, or random symbols (like "2+2" or "&&*(&*")
-    if re.fullmatch(r'[\d\+\-\*\/\=\(\)\s\&\*\%\$\#\@\!]+', cleaned):
+    # 2. Reject pure math equations, numbers, or random symbols
+    if re.fullmatch(r'[\d\+\-\*\/\=\(\)\s\&\*\%\$\#\@\!\^\.\,]+', cleaned):
         return False
         
-    # Ensure there are at least 3 actual alphabetical letters
+    # 3. Ensure there are at least 3 actual alphabetical letters
     alpha_count = sum(c.isalpha() for c in cleaned)
     if alpha_count < 3:
+        return False
+
+    # 4. Reject mathematical patterns (e.g., "what is 2 + 2", "50 * 4", "100 / 5", "2x + 4 = 10")
+    math_patterns = [
+        r'\d+\s*[\+\-\*\/\^%]\s*\d+',       # e.g., 2 + 2, 50*4, 100 / 5
+        r'\d+\s*=\s*\d+',                   # e.g., 5 = 5
+        r'[a-z]\s*[\+\-\*\/=]\s*\d+',       # e.g., x + 5, 2x = 10
+        r'\b\d+\s*(plus|minus|times|multiplied by|divided by)\s*\d+\b'  # e.g. 5 plus 5
+    ]
+    if any(re.search(pattern, cleaned) for pattern in math_patterns):
+        return False
+
+    # 5. Reject calculation & arithmetic prompt keywords
+    math_calculation_keywords = [
+        "calculate", "calculation", "compute", "computation",
+        "what is the sum", "sum of", "multiply", "multiplied by",
+        "divide", "divided by", "subtract", "subtraction",
+        "square root", "cube root", "solve equation", "solve for",
+        "derivative", "integral", "sin(", "cos(", "tan(",
+        "algebra", "arithmetic", "trigonometry", "logarithm",
+        "percentage of", "what is the value of", "math problem", "maths"
+    ]
+    if any(keyword in cleaned for keyword in math_calculation_keywords):
+        return False
+        
+    # 6. Reject non-life problem intents (image generation, coding, weather, general trivia)
+    forbidden_keywords = [
+        "generate image", "create image", "draw", "paint", "create photo", "make an image",
+        "write code", "python code", "javascript", "html", "css", "solve bug", "coding",
+        "weather", "temperature", "stock price", "crypto", "bitcoin",
+        "recipe", "how to cook", "movie", "song lyrics"
+    ]
+    if any(keyword in cleaned for keyword in forbidden_keywords):
         return False
         
     return True
@@ -41,11 +74,11 @@ def gita_chat(req: ChatRequest):
     if not query:
         raise HTTPException(status_code=400, detail="Message cannot be empty.")
 
-    # 0. Validate if input is a genuine life problem or sentence
+    # 0. Validate if input is a genuine life problem or spiritual dilemma
     if not is_valid_life_problem(query):
         return {
             "success": False,
-            "message": "Please write a meaningful sentence or life problem so Krishna can guide you properly."
+            "message": "Please write a meaningful sentence or life problem so Krishna can guide you properly. Math calculations, image generation, and coding prompts are not supported."
         }
 
     # 1. Retrieve top matching candidates
@@ -60,7 +93,7 @@ def gita_chat(req: ChatRequest):
     # 2. Re-rank to get the best primary match and supporting options
     primary, supporting = ranking_service.rank_candidates(query, candidates)
 
-    # Check if best match score is within acceptable relevance bounds (lower L2 distance is better)
+    # Check if best match score is within acceptable relevance bounds
     best_score = primary.get('score', 999.0)
     
     # Generate the AI personalized explanation connecting the user's query to the shloka
