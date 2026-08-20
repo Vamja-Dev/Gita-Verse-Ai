@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, User, X, Eye, BookOpen } from 'lucide-react';
 import { charactersData } from '../data/charactersData';
+import characterBg from '../assets/images/character-bg.png';
 
 export default function CharacterEncyclopedia({ onNavigate }) {
   const [selectedChar, setSelectedChar] = useState(null);
@@ -16,17 +17,21 @@ export default function CharacterEncyclopedia({ onNavigate }) {
   return (
     <main className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-[#07050d] pb-24 selection:bg-amber-500 selection:text-slate-950">
       
-      {/* Modern Cinematic Background with Ambient Glows */}
+      {/* Background Image Layer with Optimized Visibility */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0712] via-[#07050d] to-[#040307]" />
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{ 
+            backgroundImage: `url(${characterBg})`,
+            opacity: 0.85
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0712]/60 via-[#07050d]/50 to-[#040307]/70" />
         
-        {/* Glowing atmospheric orbs for a modern futuristic-spiritual vibe */}
+        {/* Glowing atmospheric orbs */}
         <div className="absolute top-[10%] left-[20%] w-[550px] h-[550px] rounded-full bg-amber-500/10 blur-[160px]" />
         <div className="absolute top-[40%] right-[10%] w-[650px] h-[650px] rounded-full bg-purple-600/10 blur-[180px]" />
         <div className="absolute bottom-[20%] left-[15%] w-[600px] h-[600px] rounded-full bg-amber-600/5 blur-[200px]" />
-
-        {/* Modern subtle noise/grid texture */}
-        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:36px_36px]" />
       </div>
 
       <div className="relative z-20 pt-36 px-6 md:px-16 max-w-7xl mx-auto space-y-20">
@@ -44,7 +49,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
             Discover the profound roles, philosophies, and destinies of all {characters.length} iconic figures of Mahabharata.
           </p>
 
-          {/* Modern Glassmorphic Faction Filter Buttons */}
+          {/* Faction Filter Buttons */}
           <div className="flex flex-wrap justify-center gap-3 pt-6">
             {['ALL', 'PANDAVA', 'KAURAVA', 'DIVINE'].map((cat) => (
               <button
@@ -62,7 +67,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
           </div>
         </div>
 
-        {/* Alternating Character Rows with Modern Glass Cards */}
+        {/* Character Rows */}
         <div className="space-y-28">
           {filteredCharacters.map((char, index) => {
             const isEven = index % 2 === 0;
@@ -78,7 +83,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                   isEven ? '' : 'lg:flex-row-reverse'
                 }`}
               >
-                {/* Modern Image Box with Glow on Hover */}
                 <div
                   onClick={() => setSelectedChar(char)}
                   className="relative group w-full lg:w-1/2 rounded-3xl overflow-hidden border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] cursor-pointer"
@@ -90,7 +94,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                     className="w-full h-[380px] md:h-[450px] object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   
-                  {/* Modern Hover Overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-slate-950/60 backdrop-blur-sm">
                     <span className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-amber-500 text-slate-950 font-sans font-bold text-xs tracking-widest uppercase shadow-[0_0_25px_rgba(245,158,11,0.5)] transform translate-y-2 group-hover:translate-y-0 transition-all">
                       <Eye className="w-4 h-4" /> Unroll Character Scroll
@@ -105,7 +108,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                   </div>
                 </div>
 
-                {/* Content Box */}
                 <div className="w-full lg:w-1/2 space-y-6">
                   <div className="space-y-3">
                     <span className="text-xs font-sans text-amber-400/90 uppercase tracking-[0.25em] font-semibold">
@@ -126,7 +128,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                     </p>
                   </div>
 
-                  {/* Highlighted Key Points for Main Card */}
                   <div className="space-y-3 bg-[#0d0914]/80 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 shadow-xl">
                     <h4 className="text-xs font-sans uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-amber-400" /> Soul Highlights
@@ -143,7 +144,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
 
                   <button
                     onClick={() => setSelectedChar(char)}
-                    className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold font-sans text-xs tracking-widest uppercase hover:from-amber-400 hover:to-amber-500 transition-all duration-300 cursor-pointer shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:shadow-[0_0_35px_rgba(245,158,11,0.5)]"
+                    className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold font-sans text-xs tracking-widest uppercase hover:from-amber-400 hover:to-amber-500 transition-all duration-300 cursor-pointer shadow-[0_0_25px_rgba(245,158,11,0.3)]"
                   >
                     Explore Full Profile
                   </button>
@@ -155,7 +156,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
 
       </div>
 
-      {/* Modern Glassmorphic Detail Modal with Custom 1600x1193 Aspect Ratio Box */}
+      {/* Detail Modal */}
       <AnimatePresence>
         {selectedChar && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
@@ -195,7 +196,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                 <p className="text-sm text-slate-400 font-sans">{selectedChar.title}</p>
               </div>
 
-              {/* Exact 1600x1193 Aspect Ratio Box Matching Your Image Dimensions */}
               <div 
                 className="relative w-full rounded-3xl overflow-hidden border border-amber-500/30 bg-[#0d0914] shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
                 style={{ aspectRatio: '1600 / 1193' }}
@@ -207,13 +207,11 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                 />
               </div>
 
-              {/* Abundant Content Paragraphs inside Modal */}
               <div className="space-y-6 font-sans text-slate-300 text-base md:text-lg leading-relaxed font-light">
                 {selectedChar.fullDetails?.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
 
-                {/* Highlighted Key Points Included Inside Modal */}
                 <div className="bg-slate-950/60 border border-amber-500/20 rounded-2xl p-6 md:p-8 space-y-4 shadow-xl my-6">
                   <h4 className="text-xs md:text-sm uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-amber-400" /> Key Milestones & Lineage Highlights
@@ -228,7 +226,6 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                   </ul>
                 </div>
 
-                {/* Highlighted Gita Connection & Core Philosophy Box */}
                 {selectedChar.gitaConnection && (
                   <div className="bg-gradient-to-br from-amber-500/15 via-[#161022] to-purple-900/20 border border-amber-500/40 rounded-2xl p-6 md:p-8 space-y-4 shadow-xl backdrop-blur-md my-6">
                     <div className="flex items-center gap-2 text-amber-400 font-sans font-bold text-xs md:text-sm uppercase tracking-widest">

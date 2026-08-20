@@ -78,7 +78,7 @@ def gita_chat(req: ChatRequest):
     if not is_valid_life_problem(query):
         return {
             "success": False,
-            "message": "Please write a meaningful sentence or life problem so Krishna can guide you properly. Math calculations, image generation, and coding prompts are not supported."
+            "message": "Please write a meaningful sentence or life problem so God Krishna can guide you properly. Math calculations, image generation, and coding prompts are not supported."
         }
 
     # 1. Retrieve top matching candidates
