@@ -7,6 +7,7 @@ export default function CursorRevealSection() {
   const canvasRef = useRef(null);
   const revealVideoRef = useRef(null);
   const baseVideoRef = useRef(null);
+  const secondBaseVideoRef = useRef(null); // Reference for the second base video element
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -15,11 +16,13 @@ export default function CursorRevealSection() {
     const canvas = canvasRef.current;
     const revealVid = revealVideoRef.current;
     const baseVid = baseVideoRef.current;
-    if (!container || !canvas || !revealVid || !baseVid) return;
+    const secondBaseVid = secondBaseVideoRef.current;
+    if (!container || !canvas || !revealVid || !baseVid || !secondBaseVid) return;
 
-    // Slow down playback speed for both videos
+    // Slow down playback speed for videos
     revealVid.playbackRate = 0.7;
     baseVid.playbackRate = 0.7;
+    secondBaseVid.playbackRate = 0.7;
 
     const ctx = canvas.getContext('2d');
     const brushRadius = 143;
@@ -40,11 +43,28 @@ export default function CursorRevealSection() {
       videoReady = true;
       revealVid.play().catch(err => console.log("Autoplay prevented:", err));
       baseVid.play().catch(err => console.log("Autoplay prevented:", err));
+      secondBaseVid.play().catch(err => console.log("Autoplay prevented:", err));
       paintCover();
     };
 
     revealVid.onloadeddata = checkVideosReady;
     baseVid.onloadeddata = checkVideosReady;
+    secondBaseVid.onloadeddata = checkVideosReady;
+
+    // Synchronized loop handler for both base video layers at 8 seconds to prevent white screen flashes
+    const handleTimeUpdate = () => {
+      if (baseVid.currentTime >= 8) {
+        baseVid.currentTime = 0;
+        baseVid.play().catch(err => {});
+      }
+      if (secondBaseVid.currentTime >= 8) {
+        secondBaseVid.currentTime = 0;
+        secondBaseVid.play().catch(err => {});
+      }
+    };
+
+    baseVid.addEventListener('timeupdate', handleTimeUpdate);
+    secondBaseVid.addEventListener('timeupdate', handleTimeUpdate);
 
     function paintCover(){
       if (!videoReady || !canvas.width || !canvas.height) return;
@@ -151,6 +171,8 @@ export default function CursorRevealSection() {
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
       cancelAnimationFrame(animationFrameId);
+      if (baseVid) baseVid.removeEventListener('timeupdate', handleTimeUpdate);
+      if (secondBaseVid) secondBaseVid.removeEventListener('timeupdate', handleTimeUpdate);
       if (resizeObserver && container) resizeObserver.unobserve(container);
     };
   }, []);
@@ -173,23 +195,22 @@ export default function CursorRevealSection() {
       />
 
       <div className="absolute inset-0 z-0" id="liquid">
-        {/* BACKDROP — unique query parameter prevents Chrome cache stream collision */}
+        {/* BACKDROP — blur layer */}
         <video
           ref={baseVideoRef}
           src={`${videoBase}?cache=blur-layer`}
           autoPlay
-          loop
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover object-center scale-110 blur-2xl brightness-[0.45] saturate-125"
         />
 
-        {/* BASE VIDEO — unique query parameter prevents Chrome cache stream collision */}
+        {/* BASE VIDEO WITH SEPARATE REF */}
         <video
+          ref={secondBaseVideoRef}
           id="heroBaseVideo"
           src={`${videoBase}?cache=base-layer`}
           autoPlay
-          loop
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-contain object-center"
