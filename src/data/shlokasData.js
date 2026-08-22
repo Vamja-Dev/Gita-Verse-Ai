@@ -501,6 +501,26 @@ export const shlokasData = {
       }
     },
     {
+      "shloka_number": 26,
+      "sanskrit": "तत्रापश्यत्स्थितान्पार्थः पितॄनथ पितामहान् |\nआचार्यान्मातुलान्भ्रातॄन्पुत्रान्पौत्रान्सखींस्तथा ||१-२६||",
+      "transliteration": "tatrāpaśyatsthitānpārthaḥ pitṝnatha pitāmahān .\nācāryānmātulānbhrātṛnputrānpautrānsakhīṃstathā ||1-26||",
+      "translations": {
+        "english": "There Arjuna saw, standing within both armies, fathers and grandfathers, teachers, maternal uncles, brothers, sons, grandsons, and friends, as well as fathers-in-law and well-wishers.",
+        "hindi": "वहाँ अर्जुन ने दोनों सेनाओं में खड़े हुए पिताओं को, पितामहों को, आचार्यों को, माताओं के भाइयों (मामाओं) को, भाइयों को, पुत्रों को, पौत्रों को तथा मित्रों को, ससुरों को और सुहृदों को भी देखा।",
+        "gujarati": "ત્યાં અર્જુને બંને સેનાઓમાં ઊભેલા પિતાઓને, પિતામહોને, આચાર્યોને, મામાઓને, ભાઈઓને, પુત્રોને, પૌત્રોને તથા મિત્રોને, સસરાઓને અને સુહૃદોને પણ જોયા."
+      },
+      "explanations": {
+        "english": "In this verse, Sanjaya describes how Arjuna looked across the battle lines of both Kauravas and Pandavas and beheld his close relatives, respected teachers, childhood friends, elders, and loved ones standing arrayed against each other for war. This sudden, intimate realization of impending bloodshed among his own kin acts as the psychological catalyst for his profound emotional collapse and moral dilemma.",
+        "hindi": "इस श्लोक में संजय धृतराष्ट्र को बताते हैं कि कुरुक्षेत्र के युद्ध मैदान में दोनों सेनाओं के बीच खड़े होकर अर्जुन ने अपने ही परिजनों, गुरुओं, ससुरों, मित्रों और सगे-सम्बन्धियों को आमने-सामने युद्ध के लिए तैयार देखा। अपने ही लोगों को मौत के मुँह में खड़ा देखकर अर्जुन के मन में तीव्र करुणा और मोह उत्पन्न होता है, जो आगे चलकर उसके विषाद का मुख्य कारण बनता है।",
+        "gujarati": "આ શ્લોકમાં સંજય ધૃતરાષ્ટ્રને જણાવે છે કે કુરુક્ષેત્રના યુદ્ધ મેદાનમાં બંને સેનાઓની વચ્ચે ઊભા રહીને અર્જુને પોતાના જ સ્વજનો, ગુરુજનો, મિત્રો અને સગા-સંબંધીઓને આમસામે યુદ્ધ માટે તૈયાર જોયા. પોતાના જ સ્વજનોને મોતના મુખમાં ઊભેલા જોઈને અર્જુનના મનમાં તીવ્ર કરુણા અને મોહ ઉત્પન્ન થાય છે, જે તેના ભારે માનસિક વિષાદનું કારણ બને છે."
+      },
+      "real_life_example": {
+        "english": "Imagine an individual who, after years of intense legal or corporate rivalry, suddenly finds themselves in a courtroom facing their own childhood best friends, respected mentors, and close family members on the opposing side, making it emotionally impossible to proceed without severe inner conflict.",
+        "hindi": "इसे किसी ऐसे व्यक्ति के उदाहरण से समझिए जो किसी कड़े व्यावसायिक या कानूनी विवाद के बीच अचानक यह देखे कि विरोधी पक्ष में और कोई नहीं बल्कि उसके अपने बचपन के जिगरी दोस्त, सम्मानित गुरु और करीबी रिश्तेदार खड़े हैं, जिससे उसके लिए आगे बढ़ना भावनात्मक रूप से अत्यंत असहनीय हो जाता है।",
+        "gujarati": "આને કોઈ એવા વ્યક્તિના ઉદાહરણથી સમજો જે કોઈ કઠિન વ્યાવસાયિક કે કાનૂની વિવાદ વચ્ચે અચાનક એ જોવે કે વિરોધી પક્ષમાં બીજું કોઈ નહીં પણ તેના પોતાના જ બાળપણના મિત્રો, આદરણીય ગુરુઓ અને નિકટના સગા-સંબંધીઓ ઊભા છે, જેનાથી તેના માટે આગળ વધવું ભાવનાત્મક રીતે અત્યંત અસહ્ય બની જાય છે."
+      }
+    },
+    {
       "shloka_number": 27,
       "sanskrit": "श्वशुरान्सुहृदश्चैव सेनयोरुभयोरपि |\nतान्समीक्ष्य स कौन्तेयः सर्वान्बन्धूनवस्थितान् ||१-२७||",
       "transliteration": "śvaśurānsuhṛdaścaiva senayorubhayorapi .\ntānsamīkṣya sa kaunteyaḥ sarvānbandhūnavasthitān ||1-27||",
@@ -2240,26 +2260,6 @@ export const shlokasData = {
         "english": "A restless individual constantly chasing impulsive desires and rushing from one distraction to another can never focus deeply on a meaningful task; without focus, they cannot master a skill, and without a sense of accomplishment or mastery, inner peace and true life satisfaction remain forever out of reach.",
         "hindi": "जैसे एक बेचैन और भटका हुआ व्यक्ति जो हर समय नई-नई चीज़ों और भटकाव के पीछे भागता रहता है, वह कभी किसी सार्थक काम में गहराई से एकाग्र नहीं हो सकता; एकाग्रता के बिना वह किसी कला में निपुण नहीं हो सकता, और बिना किसी उपलब्धि या महारत के, उसके जीवन में कभी मानसिक शांति और सच्चा संतोष नहीं आ सकता।",
         "gujarati": "જેમ એક બેચેન અને ભટકેલો વ્યક્તિ જે દરેક સમયે નવી-નવી ચીજો અને વિક્ષેપો પાછળ દોડ્યા કરે છે, તે ક્યારેય કોઈ સાર્થક કામમાં ઊંડાણપૂર્વક એકાગ્ર થઈ શકતો નથી; એકાગ્રતા વગર તે કોઈ કળામાં નિપુણ થઈ શકતો નથી, અને સાચી સિદ્ધિ કે મહારત વગર તેના જીવનમાં ક્યારેય માનસિક શાંતિ અને સાચો સંતોષ આવી શકતો નથી."
-      }
-    },
-    {
-      "shloka_number": 67,
-      "sanskrit": "इन्द्रियाणाम् हि चरताम् यन्मनोऽनुविधीयते |\nतदस्य हरति प्रज्ञां वायुर्नावमिवाम्भसि ||२-६७||",
-      "transliteration": "indriyāṇāṃ hi caratāṃ yanmano.anuvidhīyate .\ntadasya harati prajñāṃ vāyurnāvamivāmbhasi ||2-67||",
-      "translations": {
-        "english": "For when the mind follows in the wake of the wandering senses, it carries away his discrimination, just as the wind carries away a boat on the waters.",
-        "hindi": "जैसे जल में तैरती हुई नाव को तेज हवा बहाकर दूसरी दिशा में ले जाती है, वैसे ही विषयों में विचरती हुई इन्द्रियों में से जिस इन्द्रिय के पीछे मन चला जाता है, वह अकेला मन ही इस पुरुष की बुद्धि (विवेक) को हर लेता है।",
-        "gujarati": "જેમ પાણીમાં તરતી નાવડીને તેજ પવન ખેંચી જાય છે, તેમ જ વિષયોમાં ભટકતી ઇન્દ્રિયોમાંથી જે ઇન્દ્રિય પાછળ મન ચાલ્યું જાય છે, તે એકલું મન જ આ મનુષ્યની બુદ્ધિ (વિવેક) ને હરી લે છે."
-      },
-      "explanations": {
-        "english": "God Krishna illustrates how easily spiritual downfall occurs when the mind loses its vigilance. If the mind allows itself to follow even a single wandering sense organ caught up in sensory attractions, it completely destabilizes the intellect. Just as a tempestuous wind blows a ship completely off course in the middle of an ocean, an uncontrolled mind succumbing to sensory temptation wrecks a person's entire discrimination, stability, and spiritual resolve.",
-        "hindi": "भगवान् श्रीकृष्ण एक बहुत ही सटीक उदाहरण के माध्यम से समझाते हैं कि जब मन इन्द्रियों के अधीन हो जाता है, तो मनुष्य का विवेक कैसे नष्ट हो जाता है। यदि इन्द्रियाँ विषयों में भटक रही हों और मन भी उन्हीं के पीछे-पीछे चलने लगे, तो वह अकेला मन मनुष्य की बुद्धि और विवेक को वैसे ही बहाकर ले जाता है, जैसे तेज हवा पानी में तैरती हुई नाव को उसके रास्ते से भटकाकर ले जाती है।",
-        "gujarati": "ભગવાન શ્રીકૃષ્ણ એક સચોટ ઉદાહરણ દ્વારા સમજાવે છે કે જ્યારે મન ઇન્દ્રિયોના તાબામાં થઈ જાય છે, ત્યારે મનુષ્યનો વિવેક કેવી રીતે નષ્ટ થઈ જાય છે. જો ઇન્દ્રિયો વિષયોમાં ભટકતી હોય અને મન પણ તેની પાછળ-પાછળ ચાલવા લાગે, તો તે એકલું મન મનુષ્યની બુદ્ધિ અને વિવેકને એવી જ રીતે ખેંચી જાય છે, જેમ જોરદાર પવન પાણીમાં તરતી નાવડીને તેના રસ્તેથી ભટકાવી દે છે."
-      },
-      "real_life_example": {
-        "english": "A person trying to maintain a strict savings or diet plan might stay disciplined for weeks, but if they let their mind indulge in 'just one small peek' at a tempting offer or cheat meal, that single lapse of mental control swiftly snowballs into abandoning their entire goal.",
-        "hindi": "जैसे कोई व्यक्ति अपने कड़े बजट या फिटनेस प्लान का पालन कर रहा हो, लेकिन यदि वह 'सिर्फ एक बार' की छूट के चक्कर में अपने मन को किसी प्रलोभन के पीछे लगा देता है, तो वह एक छोटी सी मानसिक चूक उसके पूरे महीनों के अनुशासन को तहस-नहस कर देती है।",
-        "gujarati": "જેમ કોઈ વ્યક્તિ પોતાના કડક બજેટ કે ફિટનેસ પ્લાનનું પાલન કરતી હોય, પરંતુ જો તે 'માત્ર એક જ વાર' ની છૂટના ચક્કરમાં પોતાના મનને કોઈ પ્રલોભન પાછળ જવા દે છે, તો તે એક નાની માનસિક ચૂક તેના મહિનાઓની શિસ્તને વેડફી નાખે છે."
       }
     },
     {
@@ -5329,27 +5329,7 @@ export const shlokasData = {
         "gujarati": "જેમ સમુદ્રની ઉથલ-પાથલ ભરેલી ઉપરી લહેરોથી ખૂબ નીચે ઊંડા પાણીમાં उतरવાથી એક શાંત, સુંદર અને સ્થિર ક્ષેત્ર મળે છે જ્યાં તોફાનોની કોઈ અસર થતી નથી; તેમ જ જે વ્યક્તિ ધ્યાન દ્વારા પોતાના ભીતરની ઊંડાણોમાં ઉતરી જાય છે, તે જીવનના બહારના તણાવ અને તોફાનોથી મુક્ત થઈને પરમ શાંતિનો અનુભવ કરે છે."
       }
     },
-    {
-      "shloka_number": 28,
-      "chapter": 6,
-      "sanskrit": "युञ्जन्नेवं सदात्मानं योगी विगतकल्मषः |\nसुखेन ब्रह्मसंस्पर्शमत्यन्तं सुखमश्नुते ||६-२८||",
-      "transliteration": "yuñjannevaṃ sadātmānaṃ yogī vigatakalmaṣaḥ .\nsukhena brahmasaṃsparśamatyantaṃ sukhamaśnute ||6-28||",
-      "translations": {
-        "english": "Thus, constantly keeping the mind steadfast in the Self, the taintless yogi easily enjoys the infinite bliss of contact with Brahman.",
-        "hindi": "इस प्रकार निरंतर अपने मन को आत्मा में स्थिर करता हुआ पाप-रहित योगी आसानी से परब्रह्म के साथ एकरूपता (ब्रह्मसंस्पर्श) के अनंत और परम सुख का अनुभव करता है।",
-        "gujarati": "આ પ્રકારે નિરંતર પોતાના મનને આત્મામાં સ્થિર કરનાર પાપ-રહિત યોગી સરળતાથી પરબ્રહ્મ સાથેના એકરૂપતા (બ્રહ્મસંસ્પર્શ) ના અનંત અને પરમ સુખનો અનુભવ કરે છે."
-      },
-      "explanations": {
-        "english": "God Krishna summarizes the ultimate destination and reward of steady meditation. When a yogi constantly practices anchoring the mind within, all mental impurities and karmic stains are burned away (vigata-kalmaṣaḥ). Freed from these obstacles, the practitioner easily attains supreme, unending transcendental joy through direct union and contact with the Infinite (brahma-saṃsparśa).",
-        "hindi": "भगवान् श्रीकृष्ण स्थिर ध्यान के अंतिम और सर्वोच्च फल को समझाते हैं। जब साधक लगातार अपने मन को भीतर अपनी उच्च चेतना में जोड़े रखता है, तो उसके सारे पाप और मानसिक विकार धुल जाते हैं। इन बाधाओं से मुक्त होकर वह योगी अत्यंत सहजता से परब्रह्म के स्पर्श यानी परम आनंद और दिव्यता का अनुभव करता है।",
-        "gujarati": "ભગવાન શ્રીકૃષ્ણ સ્થિર ધ્યાનના અંતિમ અને સર્વોચ્ચ ફળને સમજાવે છે. જ્યારે સાધક સતત પોતાના મનને ભીતર પોતાની ઉચ્ચ ચેતનામાં જોડી રાખે છે, ત્યારે તેના તમામ પાપો અને માનસિક વિકારો ધોવાઈ જાય છે. આ બાધાઓથી મુક્ત થઈને તે યોગી અત્યંત સરળતાથી પરબ્રહ્મના સ્પર્શ એટલે કે પરમ આનંદ અને દિવ્યતાનો અનુભવ કરે છે."
-      },
-      "real_life_example": {
-        "english": "Just as a diver who descends deep beneath the rough surface waves of the ocean enters a zone of profound calm and breathtaking beauty untouched by storms, a person who dives deep within through meditation steps out of life's chaotic turbulence and rests in boundless, enduring peace.",
-        "hindi": "जैसे समुद्र की उथल-पुथल भरी ऊपरी लहरों से बहुत नीचे गहरे पानी में उतरने पर एक शांत, सुंदर और स्थिर क्षेत्र मिलता है जहाँ तूफानों का कोई असर नहीं होता; वैसे ही जो व्यक्ति ध्यान के अभ्यास से अपने भीतर की गहराइयों में उतर जाता है, वह जीवन के बाहरी तनावों और तूफानों से मुक्त होकर परम् शांति का अनुभव करता है।",
-        "gujarati": "જેમ સમુદ્રની ઉથલ-પાથલ ભરેલી ઉપરી લહેરોથી ખૂબ નીચે ઊંડા પાણીમાં उतरવાથી એક શાંત, સુંદર અને સ્થિર ક્ષેત્ર મળે છે જ્યાં તોફાનોની કોઈ અસર થતી નથી; તેમ જ જે વ્યક્તિ ધ્યાન દ્વારા પોતાના ભીતરની ઊંડાણોમાં ઉતરી જાય છે, તે જીવનના બહારના તણાવ અને તોફાનોથી મુક્ત થઈને પરમ શાંતિનો અનુભવ કરે છે."
-      }
-    },
+
     {
       "shloka_number": 29,
       "sanskrit": "सर्वभूतस्थमात्मानं सर्वभूतानि चात्मनि |\nईक्षते योगयुक्तात्मा सर्वत्र समदर्शनः ||६-२९||",
@@ -6733,46 +6713,6 @@ export const shlokasData = {
         "english": "Imagine a recurring seasonal cycle of a deciduous forest. In spring and summer, trees sprout leaves, flowers bloom, and wildlife thrives with vibrant activity. When winter arrives, everything goes dormant, leaves fall, and life seemingly disappears, only to repeat the exact same cycle next year. Without breaking free from this loop, nature continues its blind, mechanical routine. Similarly, souls trapped in material consciousness blindly repeat the cycle of birth and action until spiritual awakening brings them to a permanent, transcendent reality.",
         "hindi": "इसे पतझड़ और बसंत वाले जंगलों के मौसमी चक्र से समझिए। वसंत और गर्मियों में पेड़ों पर नई पत्तियाँ उगती हैं, फूल खिलते हैं, और वन्य जीवन जीवंत हो उठता है। जब सर्दियाँ आती हैं, तो सब कुछ सुप्त हो जाता है, पत्तियाँ झड़ जाती हैं, और जीवन थम सा जाता है—और अगले साल फिर से यही चक्र दोहराया जाता है। इस दायरे से बाहर निकले बिना प्रकृति अपनी अंधी, यांत्रिक दिनचर्या को चलाती रहती है। ठीक वैसे ही, भौतिक चेतना में फँसे जीव तब तक जन्म और कर्म के इस चक्र को दोहराते रहते हैं जब तक आध्यात्मिक जागृति उन्हें एक शाश्वत और दिव्य वास्तविकता तक नहीं पहुँचा देती।",
         "gujarati": "આને પાનખર અને વસંતવાળા જંગલોના મોસમી ચક્રથી સમજો. વસંત અને ઉનાળામાં વૃક્ષો પર નવા પાંદડા ફૂટે છે, ફૂલો ખીલે છે, અને વન્ય જીવન ધમધમી ઉઠે છે. જ્યારે શિયાળો આવે છે, ત્યારે બધું સુષુપ્ત થઈ જાય છે, પાંદડા ખરી પડે છે, અને જીવન થંભી જાય છે—અને આવતા વર્ષે ફરીથી આ જ ચક્ર દોહરાય છે. આ ઘેરામાંથી બહાર નીકળ્યા વગર પ્રકૃતિ પોતાની આંધળી, યાંત્રિક દિનચર્ચાઓ ચલાવ્યા કરે છે. બરાબર તે જ રીતે, ભૌતિક ચેતનામાં ફસાયેલા જીવો જ્યાં સુધી આધ્યાત્મિક જાગૃતિ તેમને શાશ્વત અને દિવ્ય વાસ્તવિકતા સુધી ન પહોંચાડે ત્યાં સુધી જન્મ અને કર્મના આ ચક્રને દોહરાવ્યા કરે છે."
-      }
-    },
-    {
-      "shloka_number": 18,
-      "sanskrit": "अव्यक्ताद् व्यक्तयः सर्वाः प्रभवन्त्यहरागमे |\nरात्र्यागमे प्रलीयन्ते तत्रैवाव्यक्तसंज्ञके ||८-१८||",
-      "transliteration": "avyaktād vyaktayaḥ sarvāḥ prabhavantyaharāgame |\nrātryāgame pralīyante tatraivāvyaktasaṃjñake ||8-18||",
-      "translations": {
-        "english": "At the coming of day, all manifested beings emerge from the Unmanifest; and at the coming of night, they are dissolved into the same 'Unmanifest'.",
-        "hindi": "ब्रह्मा के दिन के आरम्भ में सभी प्राणी अव्यक्त से उत्पन्न होकर व्यक्त (प्रकट) होते हैं और रात्रि के आगमन पर वे उसी अव्यक्त में लीन हो जाते हैं।",
-        "gujarati": "બ્રહ્માના દિવસના આરંભમાં તમામ પ્રાણીઓ અવ્યક્તમાંથી વ્યક્ત (પ્રગટ) થાય છે અને રાત્રિના આગમન પર તેઓ તે જ અવ્યક્તમાં વિલીન થઈ જાય છે."
-      },
-      "explanations": {
-        "english": "God Krishna explains the cyclic nature of cosmic manifestation. Just as thoughts arise from the silent depths of the mind when we wake and dissolve back into it when we sleep, the entire universe undergoes a rhythmic expansion and contraction. At the 'dawn' of Brahma's day, the latent, unmanifest potential of the universe becomes manifest. When 'night' falls, everything returns to its unmanifest, seed-like state. This process is eternal, demonstrating that all material forms are transient, originating from and returning to the same source.",
-        "hindi": "भगवान कृष्ण ब्रह्मांडीय सृष्टि के चक्रीय स्वभाव को समझाते हैं। जैसे जागने पर मन की शांत गहराइयों से विचार उत्पन्न होते हैं और सोने पर उसी में विलीन हो जाते हैं, वैसे ही संपूर्ण ब्रह्मांड लयबद्ध तरीके से फैलता और सिकुड़ता है। ब्रह्मा के दिन के 'सूर्योदय' पर, ब्रह्मांड की अव्यक्त और सुप्त क्षमताएं प्रकट (व्यक्त) हो जाती हैं। जब 'रात्रि' का आगमन होता है, तो सब कुछ पुनः अपने अव्यक्त, बीज-रूप अवस्था में लौट आता है। यह प्रक्रिया शाश्वत है, जो दर्शाती है कि सभी भौतिक रूप नश्वर हैं—वे एक ही स्रोत से उत्पन्न होते हैं और उसी में वापस लौट जाते हैं.",
-        "gujarati": "ભગવાન શ્રીકૃષ્ણ બ્રહ્માંડની સૃષ્ટિના ચક્રીય સ્વભાવને સમજાવે છે. જેમ જાગતી વખતે મનની શાંત ઊંડાણોમાંથી વિચારો ઉત્પન્ન થાય છે અને સૂતી વખતે તેમાં જ વિલીન થઈ જાય છે, તેમ સંપૂર્ણ બ્રહ્માંડ લયબદ્ધ રીતે વિસ્તરે છે અને સંકોચાય છે. બ્રહ્માના દિવસના 'સૂર્યોદય' પર, બ્રહ્માંડની અવ્યક્ત અને સુષુપ્ત ક્ષમતાઓ પ્રગટ (વ્યક્ત) થાય છે. જ્યારે 'રાત્રિ'નું આગમન થાય છે, ત્યારે બધું ફરી પાછું પોતાના અવ્યક્ત, બીજ-રૂપ અવસ્થામાં આવી જાય છે. આ પ્રક્રિયા શાશ્વત છે, જે દર્શાવે છે કે તમામ ભૌતિક સ્વરૂપો નશ્વર છે—તેઓ એક જ સ્ત્રોતમાંથી ઉત્પન્ન થાય છે અને તેમાં જ પાછા વિલીન થઈ જાય છે."
-      },
-      "real_life_example": {
-        "english": "Think of a film projection. Before the movie begins, the screen is blank—it holds the latent potential for a thousand stories. As the projector starts, the images appear on the screen, manifesting as characters and events. When the projector turns off, all those images return to the blank screen again. The screen itself never changed, just as the ultimate Divine Source remains unchanged while the 'movie' of the universe plays out in cycles of appearance and disappearance.",
-        "hindi": "इसे फिल्म प्रोजेक्टर के उदाहरण से समझें। फिल्म शुरू होने से पहले, पर्दा खाली होता है—इसमें हजारों कहानियों की सुप्त संभावना छिपी होती है। जैसे ही प्रोजेक्टर चालू होता है, पर्दे पर चित्र उभरने लगते हैं, जो पात्रों और घटनाओं के रूप में प्रकट होते हैं। जब प्रोजेक्टर बंद होता है, तो वे सभी चित्र वापस खाली पर्दे में समा जाते हैं। पर्दा कभी नहीं बदलता, ठीक वैसे ही जैसे परमात्मा का मूल स्रोत अपरिवर्तनीय रहता है, जबकि ब्रह्मांड की यह 'फिल्म' प्रकट और अदृश्य होने के चक्र में चलती रहती है।",
-        "gujarati": "આને ફિલ્મ પ્રોજેક્ટરના ઉદાહરણથી સમજો. ફિલ્મ શરૂ થયા પહેલાં, પડદો ખાલી હોય છે—તેમાં હજારો વાર્તાઓની સુષુપ્ત સંભાવના છુપાયેલી હોય છે. જેવું પ્રોજેક્ટર ચાલુ થાય છે, પડદા પર ચિત્રો ઉભરવા લાગે છે, જે પાત્રો અને ઘટનાઓ તરીકે પ્રગટ થાય છે. જ્યારે પ્રોજેક્ટર બંધ થાય છે, ત્યારે તે બધાં ચિત્રો પાછા ખાલી પડદામાં સમાઈ જાય છે. પડદો ક્યારેય બદલાતો નથી, બરાબર તે જ રીતે જેમ પરમાત્માનો મૂળ સ્ત્રોત અપરિવર્તનીય રહે છે, જ્યારે બ્રહ્માંડની આ 'ફિલ્મ' પ્રગટ અને અદ્રશ્ય થવાના ચક્રમાં ચાલતી રહે છે."
-      }
-    },
-    {
-      "shloka_number": 19,
-      "sanskrit": "भूतग्रामः स एवायं भूत्वा भूत्वा प्रलीयते |\nरात्र्यागमेऽवशः पार्थ प्रभवत्यहरागमे ||८-१९||",
-      "transliteration": "bhūtagrāmaḥ sa evāyaṃ bhūtvā bhūtvā pralīyate .\nrātryāgame.avaśaḥ pārtha prabhavatyaharāgame ||8-19||",
-      "translations": {
-        "english": "This same multitude of beings, being born again and again, is dissolved, helplessly, O Arjuna, at the coming of the night and comes forth at the coming of the day.",
-        "hindi": "हे पार्थ! वही यह प्राणी-समुदाय बार-बार उत्पन्न होकर प्रकृति के परवश हुआ रात्रि के आगमन पर लीन होता है और दिन के उदय होने पर पुनः प्रकट होता है।",
-        "gujarati": "હે પાર્થ! આ જ પ્રજા સમુદાય વારંવાર ઉત્પન્ન થઈને પ્રકૃતિના વશમાં થઈને રાત્રિના આગમન પર લીન થાય છે અને દિવસના ઉદય પર ફરીથી પ્રગટ થાય છે."
-      },
-      "explanations": {
-        "english": "In this verse, God Krishna explains the repetitive, cyclic nature of existence for souls bound by material conditioning (*karma* and ignorance). The collective multitude of living beings (*bhuta-gramah*) is repeatedly manifested at the dawn of Brahma's day and helplessly dissolved into the unmanifest state at the onset of Brahma's night, driven entirely by their past actions rather than true independence.",
-        "hindi": "इस श्लोक में भगवान श्रीकृष्ण सांसारिक बंधनों और कर्मों से बँध जीवों की बार-बार होने वाली उत्पत्ति और प्रलय की गति को समझाते हैं। जीवों का यह पूरा समूह (*भूतग्राम*) ब्रह्मा के दिन के आरंभ में बार-बार प्रकट होता है और रात्रि के आगमन पर अपने संस्कारों और कर्मों के परवश होकर अव्यक्त रूप में लीन हो जाता है।",
-        "gujarati": "આ શ્લોકમાં ભગવાન શ્રીકૃષ્ણ સાંસારિક બંધનો અને કર્મોથી બંધાયેલા જીવોની વારંવાર થતી ઉત્પત્તિ અને પ્રલયની ગતિને સમજાવે છે. જીવોનો આ સમૂહ બ્રહ્માના દિવસના પ્રારંભમાં વારંવાર પ્રગટ થાય છે અને રાત્રિના આગમન પર પોતાના સંસ્કારો અને કર્મોના વશ થઈને અવ્યક્ત અવસ્થામાં વિલીન થઈ જાય છે."
-      },
-      "real_life_example": {
-        "english": "Consider a seasonal marketplace or an open-air carnival that is repeatedly set up every morning, buzzes with activity all day, and is completely dismantled and packed away every night, only to be reconstructed in the exact same manner the next morning. Caught in a loop of habitual cycles without true freedom, the structural routine mirrors the involuntary cycle of birth and dissolution for those bound to material illusions.",
-        "hindi": "इसे एक ऐसे मौसमी बाज़ार या मेले के उदाहरण से समझें जो रोज सुबह लगाया जाता है, दिनभर चहल-पहल रहती है, और हर रात पूरी तरह समेट दिया जाता है, ताकि अगली सुबह फिर से वैसे ही खड़ा किया जा सके। बिना किसी सच्ची स्वतंत्रता के बार-बार चलने वाला यह चक्र उन जीवों की स्थिति को दर्शाता है जो भौतिक प्रवृत्तियों और आदतों के चक्रव्यूह में फंसे हुए हैं।",
-        "gujarati": "આને એક એવા મોસમી બજાર કે મેળાના ઉદાહરણથી સમજો જે દરરોજ સવારે સજાવવામાં આવે છે, દિવસભર ધમધમે છે અને દરરોજ રાત્રે બધું જ સંકેલી લેવામાં આવે છે, જેથી આગલી સવારે ફરીથી એ જ રીતે ઊભું કરી શકાય. કોઈ પણ પ્રકારની સાચી સ્વતંત્રતા વગર વારંવાર ચાલતું આ ચક્ર તે જીવોની સ્થિતિ દર્શાવે છે જેઓ ભૌતિક પ્રવૃત્તિઓ અને આદતોના ચક્રવ્યૂહમાં ફસાયેલા છે."
       }
     },
     {
