@@ -4,6 +4,8 @@ import { Bookmark, AlertCircle, X } from 'lucide-react';
 import { shlokasData } from '../../data/shlokasData';
 import { chaptersData } from '../../data/chaptersData';
 import GitaAudioPlayer, { stopGlobalAudio } from '../../components/GitaAudioPlayer';
+import SpeechButton from '../../components/SpeechButton';
+import { stopSpeaking } from '../../hooks/speech';
 
 export default function ChapterDetailView({ chapterNumber, onBack, backgroundImages, onNavigate, targetShloka, fromDashboard }) {
     const [searchVerse, setSearchVerse] = useState('');
@@ -19,12 +21,14 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     // Stop any playing audio if the user switches chapters or leaves the view
     const handleBackClick = () => {
         stopGlobalAudio();
+        stopSpeaking();
         onBack();
     };
 
     // Helper to close modal, stop audio, and return directly to the dashboard
     const handleCloseModal = () => {
         stopGlobalAudio();
+        stopSpeaking();
         setSelectedShloka(null);
 
         const openedFromDashboard = localStorage.getItem('gitaverse_opened_from_dashboard');
@@ -66,6 +70,13 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
             setSavedShlokasMap({});
         }
     }, [userEmail, isLoggedIn]);
+
+    // Cleanup speech when component unmounts
+    useEffect(() => {
+        return () => {
+            stopSpeaking();
+        };
+    }, []);
 
     const chapterInfo = chaptersData.find(c => (c.number || c.chapter_number) === chapterNumber) || {
         englishName: `Chapter ${chapterNumber}`,
@@ -170,7 +181,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
             >
                 {/* Chapter Title Banner on Parchment with Total Shlokas Count Badge */}
                 <div className="relative text-center mb-10 space-y-3 border-b-2 border-[#8c5a3c]/30 pb-6">
-                    {/* Total Shlokas Badge positioned in the top-right area */}
                     <div className="absolute top-0 right-0 px-3.5 py-1.5 rounded-xl bg-[#3d2314] border border-amber-500/40 text-amber-200 text-xs font-sans font-bold shadow-md tracking-wider">
                         {chapterInfo.verses_count || verses.length} Shlokas
                     </div>
@@ -329,53 +339,119 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                     <p className="text-xs text-[#6c4228] font-sans italic">{selectedShloka.transliteration}</p>
                                 </div>
 
+                                {/* TRANSLATIONS SECTION */}
                                 <div className="space-y-3">
                                     <h4 className="text-xs font-sans font-bold text-[#7c4a2b] uppercase tracking-wider">Translations</h4>
                                     <div className="grid grid-cols-1 gap-3 text-sm">
                                         <div className="p-3.5 rounded-lg bg-[#ecd0a8]/40 border border-[#8c5a3c]/30">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">English</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">English</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.translations.english} 
+                                                    language="en-IN" 
+                                                    speechId={`trans-en-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#3d2314]">{selectedShloka.translations.english}</p>
                                         </div>
                                         <div className="p-3.5 rounded-lg bg-[#ecd0a8]/40 border border-[#8c5a3c]/30">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Hindi</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Hindi</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.translations.hindi} 
+                                                    language="hi-IN" 
+                                                    speechId={`trans-hi-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#3d2314]">{selectedShloka.translations.hindi}</p>
                                         </div>
                                         <div className="p-3.5 rounded-lg bg-[#ecd0a8]/40 border border-[#8c5a3c]/30">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Gujarati</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.translations.gujarati} 
+                                                    language="gu-IN" 
+                                                    speechId={`trans-gu-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#3d2314]">{selectedShloka.translations.gujarati}</p>
                                         </div>
                                     </div>
                                 </div>
 
+                                {/* EXPLANATIONS SECTION */}
                                 <div className="space-y-4 pt-2 pb-2">
                                     <h4 className="text-xs font-sans font-bold text-[#7c4a2b] uppercase tracking-wider">Explanations</h4>
                                     <div className="grid grid-cols-1 gap-3 text-sm">
                                         <div className="p-4 rounded-lg bg-[#e3bc8e]/50 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">English Explanation</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">English Explanation</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.explanations?.english} 
+                                                    language="en-IN" 
+                                                    speechId={`exp-en-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.explanations?.english}</p>
                                         </div>
                                         <div className="p-4 rounded-lg bg-[#e3bc8e]/50 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Hindi Explanation (विस्तृत व्याख्या)</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Hindi Explanation (विस्तृत व्याख्या)</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.explanations?.hindi} 
+                                                    language="hi-IN" 
+                                                    speechId={`exp-hi-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.explanations?.hindi}</p>
                                         </div>
                                         <div className="p-4 rounded-lg bg-[#e3bc8e]/50 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Gujarati Explanation</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati Explanation</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.explanations?.gujarati} 
+                                                    language="gu-IN" 
+                                                    speechId={`exp-gu-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.explanations?.gujarati}</p>
                                         </div>
                                     </div>
 
+                                    {/* REAL-LIFE EXAMPLES SECTION */}
                                     <h4 className="text-xs font-sans font-bold text-[#7c4a2b] uppercase tracking-wider pt-2">💡 Real-Life Application / Example</h4>
                                     <div className="grid grid-cols-1 gap-3 text-sm">
                                         <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">English Example</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">English Example</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.real_life_example?.english} 
+                                                    language="en-IN" 
+                                                    speechId={`exl-en-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.english}</p>
                                         </div>
                                         <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Hindi Example</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Hindi Example</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.real_life_example?.hindi} 
+                                                    language="hi-IN" 
+                                                    speechId={`exl-hi-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.hindi}</p>
                                         </div>
                                         <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <span className="text-xs text-[#7c4a2b] block font-sans mb-1 font-bold">Gujarati Example</span>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati Example</span>
+                                                <SpeechButton 
+                                                    text={selectedShloka.real_life_example?.gujarati} 
+                                                    language="gu-IN" 
+                                                    speechId={`exl-gu-${selectedShloka.shloka_number}`} 
+                                                />
+                                            </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.gujarati}</p>
                                         </div>
                                     </div>

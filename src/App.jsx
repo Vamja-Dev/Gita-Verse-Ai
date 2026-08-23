@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/App.jsx
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/navigation/Navbar';
 import ScrollToTop from './UI/ScrollToTop';
 import IntroLoader from './components/story/IntroLoader';
@@ -50,6 +51,14 @@ export default function App() {
   // Always start as false so the intro loader plays fresh on every refresh/reload
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
+  // Force scroll position to top on initial load/refresh and disable browser scroll memory
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
   const handleCompleteIntro = () => {
     setHasSeenIntro(true);
   };
@@ -60,19 +69,19 @@ export default function App() {
       setSelectedChapterNum(payload.chapterNumber);
       setSelectedShlokaNum(payload.shlokaNumber);
       setCurrentPage('chapter-detail');
+      window.scrollTo({ top: 0, behavior: 'instant' });
       return;
     }
 
     if (pageOrAction === 'chapter' && payload) {
       setSelectedChapterNum(payload.chapterNumber);
-      // Only set targetShloka if coming from a dashboard action
       setSelectedShlokaNum(payload.targetShloka || null);
       setCurrentPage('chapter-detail');
     } else {
-      // Clear target shloka when navigating anywhere else normally
       setSelectedShlokaNum(null);
       setCurrentPage(pageOrAction);
     }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   return (
@@ -107,8 +116,9 @@ export default function App() {
             onNavigate={handleUniversalNavigate}
             onSelectChapter={(chapNum) => {
               setSelectedChapterNum(chapNum);
-              setSelectedShlokaNum(null); // Clear out any residual target shloka
+              setSelectedShlokaNum(null);
               setCurrentPage('chapter-detail');
+              window.scrollTo({ top: 0, behavior: 'instant' });
             }}
           />
         )}
@@ -119,43 +129,44 @@ export default function App() {
             targetShloka={selectedShlokaNum}
             backgroundImages={chapterBackgrounds}
             onBack={() => {
-              setSelectedShlokaNum(null); // Reset when going back
+              setSelectedShlokaNum(null);
               setCurrentPage('learn');
+              window.scrollTo({ top: 0, behavior: 'instant' });
             }}
             onNavigate={handleUniversalNavigate}
           />
         )}
 
         {currentPage === 'meditation' && (
-          <Meditation onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <Meditation onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'four-vedas' && (
-          <FourVedas onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <FourVedas onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'four-yugas' && (
-          <FourYugas onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <FourYugas onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'timeline' && (
-          <MahabharataTimeline onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <MahabharataTimeline onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'characters' && (
-          <CharacterEncyclopedia onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <CharacterEncyclopedia onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'map' && (
-          <KurukshetraMap onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <KurukshetraMap onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'dashboard' && (
-          <UserDashboard onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <UserDashboard onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
 
         {currentPage === 'about' && (
-          <About onNavigate={handleUniversalNavigate} onBack={() => setCurrentPage('home')} />
+          <About onNavigate={handleUniversalNavigate} onBack={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'instant' }); }} />
         )}
       </main>
 

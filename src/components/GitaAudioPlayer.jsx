@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaVolumeUp, FaPause } from 'react-icons/fa';
+import { stopSpeaking } from '../hooks/speech';
 
 // Track active audio elements globally across components
 let globalAudioInstance = null;
@@ -28,6 +29,9 @@ export default function GitaAudioPlayer({ shlokaId }) {
         globalAudioInstance.pause();
         setIsPlaying(false);
       } else {
+        // Stop any active Web Speech / translation speech before playing
+        stopSpeaking();
+
         globalAudioInstance.play()
           .then(() => setIsPlaying(true))
           .catch((err) => console.error("Audio playback error:", err));
@@ -43,6 +47,9 @@ export default function GitaAudioPlayer({ shlokaId }) {
         globalSetStateCallback(false);
       }
     }
+
+    // Stop translation speech when Sanskrit audio starts
+    stopSpeaking();
 
     // Create or reuse audio instance for this shloka
     const audio = new Audio(audioUrl);

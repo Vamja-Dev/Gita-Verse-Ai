@@ -61,7 +61,7 @@ export default function AIInputBox({ inputQuery, setInputQuery, handleSendMessag
       <div className="flex items-center justify-between mb-3 px-2 text-xs text-amber-200/80 font-sans">
         <span className="flex items-center gap-1.5">
           <Sparkles size={14} className="text-amber-400" />
-          Jai Shri Krishna! Ask me about life, karma, purpose, or any verse.
+          Jai Shri Krishna! Ask me about life, karma, purpose, or any shloka.
         </span>
       </div>
 
