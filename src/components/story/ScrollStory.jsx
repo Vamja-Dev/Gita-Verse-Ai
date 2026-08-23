@@ -1,3 +1,4 @@
+// src/components/story/ScrollStory.jsx
 import React from 'react';
 import { storyVerses } from '../../data/storyData';
 import LayoutManager from './LayoutManager';
@@ -12,7 +13,7 @@ export default function ScrollStory() {
       {/* Manuscript Verses */}
       <div className="relative z-10 space-y-40">
         {storyVerses.map((verse, index) => (
-          <LayoutManager key={verse.id} verse={verse} index={index} />
+          <LayoutManager key={verse.id || index} verse={verse} index={index} />
         ))}
       </div>
     </div>

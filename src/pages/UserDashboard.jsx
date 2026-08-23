@@ -49,7 +49,7 @@ export default function UserDashboard({ onNavigate }) {
             </div>
             <div>
               <h1 className="text-2xl font-serif text-amber-100">{userName}</h1>
-              <span className="text-xs font-sans text-amber-400 uppercase tracking-widest">Saved Sanctuary • {savedShlokas.length} Verses Bookmarked</span>
+              <span className="text-xs font-sans text-amber-400 uppercase tracking-widest">Saved Sanctuary • {savedShlokas.length} Shlokas Bookmarked</span>
             </div>
           </div>
         </div>

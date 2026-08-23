@@ -1,10 +1,11 @@
+// src/components/About.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Globe, Compass, Cpu, Book, Brain, Zap, ShieldCheck, LogIn } from 'lucide-react';
+import { Sparkles, Globe, Compass, Cpu, Book, Brain, Zap, ShieldCheck } from 'lucide-react';
 import { FaYoutube, FaInstagram, FaFacebook, FaLinkedin, FaDiscord, FaXTwitter } from "react-icons/fa6";
 import aboutBg from '../assets/images/about-bg.png';
 
-export default function About({ onNavigate }) {
+export default function About() {
   // Social links configuration with direct login/community URLs
   const socialLinks = [
     { name: 'YouTube', icon: <FaYoutube className="text-red-500 text-lg" />, url: 'https://www.youtube.com/login' },
@@ -101,25 +102,12 @@ export default function About({ onNavigate }) {
             </ul>
           </div>
 
-          {/* Social Media Connection & Login Section */}
+          {/* Social Media Connection Section */}
           <div className="space-y-6 pt-4 border-t border-amber-500/20">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <h3 className="text-xl font-serif text-amber-200 flex items-center gap-2.5">
-                <Globe className="w-5 h-5 text-amber-400" />
-                Connect With Our Community
-              </h3>
-              
-              {/* Account Login Link / Button */}
-              <motion.button
-                onClick={() => onNavigate ? onNavigate('login') : window.location.href = '/login'}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-sans font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.4)] cursor-pointer transition-all"
-              >
-                <LogIn size={15} />
-                <span>Account Login</span>
-              </motion.button>
-            </div>
+            <h3 className="text-xl font-serif text-amber-200 flex items-center gap-2.5">
+              <Globe className="w-5 h-5 text-amber-400" />
+              Connect With Our Community
+            </h3>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-2">
               {socialLinks.map((social, idx) => (
