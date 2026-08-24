@@ -1,3 +1,4 @@
+// src/components/story/ChapterDetailView.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, AlertCircle, X } from 'lucide-react';
@@ -13,6 +14,9 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     const [selectedImage, setSelectedImage] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [savedShlokasMap, setSavedShlokasMap] = useState({});
+    
+    // State to track which real-life example tab (1 to 5) is currently open in the scroll modal
+    const [activeExampleTab, setActiveExampleTab] = useState('1');
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -30,6 +34,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         stopGlobalAudio();
         stopSpeaking();
         setSelectedShloka(null);
+        setActiveExampleTab('1'); // Reset tab on close
 
         const openedFromDashboard = localStorage.getItem('gitaverse_opened_from_dashboard');
         if (openedFromDashboard === 'true') {
@@ -53,6 +58,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
             const foundVerse = verses.find(v => Number(v.shloka_number) === Number(targetShloka));
             if (foundVerse) {
                 setSelectedShloka(foundVerse);
+                setActiveExampleTab('1');
             }
         }
     }, [chapterNumber, targetShloka]);
@@ -216,7 +222,10 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                 <motion.div
                                     key={shloka.shloka_number}
                                     whileHover={{ scale: 1.01 }}
-                                    onClick={() => setSelectedShloka(shloka)}
+                                    onClick={() => {
+                                        setSelectedShloka(shloka);
+                                        setActiveExampleTab('1'); // Reset to example 1 on open
+                                    }}
                                     className="p-6 rounded-xl bg-[#faebd7]/90 border-2 border-[#a67c52] hover:border-[#5c3a21] cursor-pointer shadow-md transition-all flex flex-col gap-3 group relative"
                                 >
                                     <div className="flex items-center justify-between text-xs font-sans text-[#7c4a2b]">
@@ -279,6 +288,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                             style={{ transformOrigin: 'center' }}
                             className="relative z-10 w-full max-w-3xl my-auto flex flex-col items-center py-12"
                         >
+                            {/* Scroll Top Roller */}
                             <div className="relative -mb-3 h-14 md:h-16 bg-gradient-to-b from-[#2d1508] via-[#8c5a3c] to-[#1a0c04] border-2 border-[#0a0401] rounded-full shadow-[0_15px_30px_rgba(0,0,0,0.95)] flex justify-between items-center z-30 px-3 w-[calc(100%+5rem)] md:w-[calc(100%+7rem)]">
                                 <div className="flex items-center -ml-8 md:-ml-10 pointer-events-none">
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-l border border-black" />
@@ -291,6 +301,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                 </div>
                             </div>
 
+                            {/* Scroll Paper Body */}
                             <div
                                 className="relative z-20 w-full px-8 md:px-16 py-10 space-y-6 font-serif shadow-2xl rounded-sm overflow-y-auto scrollbar-none max-h-[75vh]"
                                 style={{
@@ -417,47 +428,89 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.explanations?.gujarati}</p>
                                         </div>
                                     </div>
+                                </div>
 
-                                    {/* REAL-LIFE EXAMPLES SECTION */}
-                                    <h4 className="text-xs font-sans font-bold text-[#7c4a2b] uppercase tracking-wider pt-2">💡 Real-Life Application / Example</h4>
-                                    <div className="grid grid-cols-1 gap-3 text-sm">
-                                        <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">English Example</span>
-                                                <SpeechButton 
-                                                    text={selectedShloka.real_life_example?.english} 
-                                                    language="en-IN" 
-                                                    speechId={`exl-en-${selectedShloka.shloka_number}`} 
-                                                />
-                                            </div>
-                                            <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.english}</p>
-                                        </div>
-                                        <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Hindi Example</span>
-                                                <SpeechButton 
-                                                    text={selectedShloka.real_life_example?.hindi} 
-                                                    language="hi-IN" 
-                                                    speechId={`exl-hi-${selectedShloka.shloka_number}`} 
-                                                />
-                                            </div>
-                                            <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.hindi}</p>
-                                        </div>
-                                        <div className="p-4 rounded-lg bg-[#ecd0a8]/60 border border-[#8c5a3c]/40 space-y-1">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati Example</span>
-                                                <SpeechButton 
-                                                    text={selectedShloka.real_life_example?.gujarati} 
-                                                    language="gu-IN" 
-                                                    speechId={`exl-gu-${selectedShloka.shloka_number}`} 
-                                                />
-                                            </div>
-                                            <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.real_life_example?.gujarati}</p>
+                                {/* REAL-LIFE EXAMPLES 1-5 SELECTOR SECTION */}
+                                <div className="space-y-3 pt-2">
+                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                        <h4 className="text-xs font-sans font-bold text-[#7c4a2b] uppercase tracking-wider">
+                                            💡 Real-Life Application / Examples (1 - 5)
+                                        </h4>
+                                        
+                                        {/* Tab Buttons for Example 1, 2, 3, 4, 5 */}
+                                        <div className="flex items-center gap-1.5 bg-[#d4b087] p-1 rounded-xl border border-[#8c5a3c]/40">
+                                            {['1', '2', '3', '4', '5'].map((num) => (
+                                                <button
+                                                    key={num}
+                                                    onClick={() => setActiveExampleTab(num)}
+                                                    className={`w-7 h-7 rounded-lg text-xs font-sans font-bold transition-all cursor-pointer flex items-center justify-center ${
+                                                        activeExampleTab === num
+                                                            ? 'bg-[#3d2314] text-amber-200 shadow-md'
+                                                            : 'bg-transparent text-[#5c3a21] hover:bg-[#ecd0a8]'
+                                                    }`}
+                                                >
+                                                    {num}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
+
+                                    {/* Active Example Content Display for English, Hindi, and Gujarati */}
+                                    {selectedShloka.real_life_example && selectedShloka.real_life_example[activeExampleTab] && (
+                                        <div className="grid grid-cols-1 gap-3 text-sm">
+                                            <div className="p-4 rounded-lg bg-[#ecd0a8]/70 border-2 border-[#8c5a3c]/50 space-y-3 shadow-inner">
+                                                <div className="flex items-center justify-between border-b border-[#8c5a3c]/30 pb-2">
+                                                    <span className="text-xs text-[#3d2314] font-sans font-bold uppercase tracking-wide">
+                                                        Example {activeExampleTab} • English
+                                                    </span>
+                                                    <SpeechButton 
+                                                        text={selectedShloka.real_life_example[activeExampleTab].english} 
+                                                        language="en-IN" 
+                                                        speechId={`exl-en-${selectedShloka.shloka_number}-${activeExampleTab}`} 
+                                                    />
+                                                </div>
+                                                <p className="text-[#2c1810] text-sm leading-relaxed font-serif">
+                                                    {selectedShloka.real_life_example[activeExampleTab].english}
+                                                </p>
+                                            </div>
+
+                                            <div className="p-4 rounded-lg bg-[#ecd0a8]/70 border-2 border-[#8c5a3c]/50 space-y-3 shadow-inner">
+                                                <div className="flex items-center justify-between border-b border-[#8c5a3c]/30 pb-2">
+                                                    <span className="text-xs text-[#3d2314] font-sans font-bold uppercase tracking-wide">
+                                                        Example {activeExampleTab} • Hindi (हिंदी)
+                                                    </span>
+                                                    <SpeechButton 
+                                                        text={selectedShloka.real_life_example[activeExampleTab].hindi} 
+                                                        language="hi-IN" 
+                                                        speechId={`exl-hi-${selectedShloka.shloka_number}-${activeExampleTab}`} 
+                                                    />
+                                                </div>
+                                                <p className="text-[#2c1810] text-sm leading-relaxed font-serif">
+                                                    {selectedShloka.real_life_example[activeExampleTab].hindi}
+                                                </p>
+                                            </div>
+
+                                            <div className="p-4 rounded-lg bg-[#ecd0a8]/70 border-2 border-[#8c5a3c]/50 space-y-3 shadow-inner">
+                                                <div className="flex items-center justify-between border-b border-[#8c5a3c]/30 pb-2">
+                                                    <span className="text-xs text-[#3d2314] font-sans font-bold uppercase tracking-wide">
+                                                        Example {activeExampleTab} • Gujarati (ગુજરાતી)
+                                                    </span>
+                                                    <SpeechButton 
+                                                        text={selectedShloka.real_life_example[activeExampleTab].gujarati} 
+                                                        language="gu-IN" 
+                                                        speechId={`exl-gu-${selectedShloka.shloka_number}-${activeExampleTab}`} 
+                                                    />
+                                                </div>
+                                                <p className="text-[#2c1810] text-sm leading-relaxed font-serif">
+                                                    {selectedShloka.real_life_example[activeExampleTab].gujarati}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
+                            {/* Scroll Bottom Roller */}
                             <div className="relative -mt-3 h-14 md:h-16 bg-gradient-to-t from-[#2d1508] via-[#8c5a3c] to-[#1a0c04] border-2 border-[#0a0401] rounded-full shadow-[0_-15px_30px_rgba(0,0,0,0.95)] flex justify-between items-center z-30 px-2 w-[calc(100%+5rem)] md:w-[calc(100%+7rem)]">
                                 <div className="flex items-center -ml-8 md:-ml-10 pointer-events-none">
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-l border border-black" />
@@ -536,7 +589,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                         >
                             <button
                                 onClick={() => setSelectedImage(false)}
-                                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-slate-950/80 text-amber-300 flex items-center justify-center hover:bg-amber-600 hover:text-white transition-all font-sans font-bold shadow-lg cursor-pointer"
+                                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-2xl bg-slate-950/80 text-amber-300 flex items-center justify-center hover:bg-amber-600 hover:text-white transition-all font-sans font-bold shadow-lg cursor-pointer"
                             >
                                 ✕
                             </button>
