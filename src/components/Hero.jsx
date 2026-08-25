@@ -1,7 +1,9 @@
+// src/components/Hero.jsx
 import React from 'react';
+import { motion } from 'framer-motion';
 import ChatBox from './ChatBox';
 
-export default function Hero() {
+export default function Hero({ onNavigate }) { // 1. Accept onNavigate prop here
   const handleSendMessage = (message) => {
     console.log("User Asked:", message);
   };
@@ -20,7 +22,7 @@ export default function Hero() {
 
       {/* Center Chat Box Container Shifted Slightly Right */}
       <div className="w-full flex justify-center md:translate-x-3">
-        <ChatBox onSend={handleSendMessage} />
+        <ChatBox onSend={handleSendMessage} onNavigate={onNavigate} /> {/* 2. Pass it down to ChatBox */}
       </div>
     </section>
   );

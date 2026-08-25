@@ -221,7 +221,7 @@ export default function DailyWisdomCard() {
                   <div className="bg-[#06040a]/60 backdrop-blur-sm p-5 rounded-2xl border border-amber-500/20 shadow-inner">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-amber-400 text-xs font-bold uppercase tracking-widest">
-                        Krishna's Insight ({selectedLang.toUpperCase()})
+                        Explanation ({selectedLang.toUpperCase()})
                       </h4>
                       <SpeechButton 
                         text={wisdom.explanations[selectedLang] || wisdom.explanations.english}

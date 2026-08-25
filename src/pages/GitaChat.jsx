@@ -1,9 +1,10 @@
+// src/pages/GitaChat.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import Hero from '../components/Hero';
 import Background from '../components/Background';
 
-export default function GitaChat() {
+export default function GitaChat({ onNavigate }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -17,9 +18,9 @@ export default function GitaChat() {
         <Background />
       </div>
 
-      {/* Main Chat Experience Area (Hero contains the single unified chat interface) */}
+      {/* Main Chat Experience Area - Pass onNavigate down to Hero */}
       <div className="relative z-20 max-w-5xl mx-auto px-6 pt-0 space-y-10">
-        <Hero />
+        <Hero onNavigate={onNavigate} />
       </div>
     </motion.div>
   );

@@ -1,13 +1,13 @@
+// src/pages/Home.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
 import CursorRevealSection from '../components/home/CursorRevealSection';
-import DailyWisdomCard from '../components/home/DailyWisdomCard'; // Import Daily Wisdom component
+import DailyWisdomCard from '../components/home/DailyWisdomCard';
 import ScrollStory from '../components/story/ScrollStory';
 import IntroLoader from '../components/story/IntroLoader';
 
 export default function Home({ onNavigate }) {
-  // Check session storage so loader only runs once per session; skips on logo click/re-navigation
   const [loading, setLoading] = useState(() => {
     return !sessionStorage.getItem('hasSeenIntro');
   });
@@ -28,11 +28,10 @@ export default function Home({ onNavigate }) {
       transition={{ duration: 0.8 }}
       className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-[#06040a]"
     >
-      {/* Native Canvas Dual-Image Reveal Section acting as a wrapper */}
       <div className="relative w-full h-screen">
         <CursorRevealSection />
 
-        {/* Gita Chat Button stuck/anchored inside the image hero section */}
+        {/* Gita Chat Button anchoring to the chat page */}
         <div className="absolute bottom-8 right-8 z-30">
           <motion.button
             onClick={() => onNavigate && onNavigate('gita-chat')}
@@ -46,12 +45,10 @@ export default function Home({ onNavigate }) {
         </div>
       </div>
 
-      {/* NEW: Daily Wisdom Section anchored smoothly between hero and scroll story */}
       <section className="relative w-full py-0 px-0 bg-[#06040a]">
         <DailyWisdomCard />
       </section>
 
-      {/* Existing Storytelling Section */}
       <ScrollStory />
 
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/60 backdrop-blur-md border-t border-amber-500/10">
