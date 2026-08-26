@@ -1,3 +1,4 @@
+// src/components/LoginPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import logo from '../assets/logo.png';
@@ -7,8 +8,27 @@ import '../styles/login.css';
 
 const SHEETDB_URL = 'https://sheetdb.io/api/v1/x84p8m28inivm';
 const GOOGLE_CLIENT_ID = '168266196166-0jl5nj5lhv0qvmj539k6bvekjo3romkt.apps.googleusercontent.com';
+const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-log';
 
-// Reusable database save function with bulletproof max-ID calculation and array mapping
+// Helper to notify FastAPI backend so it prints in the terminal and logs to MongoDB
+export const sendAuthLogToBackend = async (name, email, method, status) => {
+    try {
+        await fetch(BACKEND_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                method: method,
+                status: status
+            })
+        });
+    } catch (error) {
+        console.error('Error notifying FastAPI backend auth log:', error);
+    }
+};
+
+// Reusable database save function for Google Sheets (SheetDB)
 export const saveUserToDatabase = async (name, email, password, loginMethod, status) => {
     try {
         const response = await fetch(SHEETDB_URL);
@@ -40,9 +60,13 @@ export const saveUserToDatabase = async (name, email, password, loginMethod, sta
             })
         });
         const result = await postResponse.json();
+
+        // ALSO trigger backend terminal log & MongoDB sync instantly
+        await sendAuthLogToBackend(name, email, loginMethod, status);
+
         return result;
     } catch (error) {
-        console.error('Error saving to SheetDB:', error);
+        console.error('Error saving to SheetDB/Backend:', error);
     }
 };
 
@@ -121,7 +145,7 @@ export default function LoginPage({ onNavigate }) {
                             await saveUserToDatabase(userName, userEmail, 'N/A (Google OAuth)', 'Google OAuth', 'Registered');
                         }
 
-                        // Log activity status as Logged In with timestamp
+                        // Log activity status as Logged In with timestamp (updates SheetDB + Backend Terminal)
                         await saveUserToDatabase(userName, userEmail, 'N/A', 'Google OAuth', 'Logged In');
 
                         // Store Google User Name and Email in LocalStorage
@@ -153,7 +177,7 @@ export default function LoginPage({ onNavigate }) {
         }
     };
 
-    // Register Handler (Modified to instantly log in and redirect to home)
+    // Register Handler
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         if (!regName || !regEmail || !regPwd) {
@@ -182,7 +206,7 @@ export default function LoginPage({ onNavigate }) {
 
         setRegError('Creating account & logging in...');
         try {
-            // Save as Registered first
+            // Save as Registered first (updates SheetDB + MongoDB backend)
             await saveUserToDatabase(regName, regEmail, regPwd, 'Email/Password', 'Registered');
             // Also log the active login session immediately
             await saveUserToDatabase(regName, regEmail, regPwd, 'Email/Password', 'Logged In');
@@ -218,7 +242,7 @@ export default function LoginPage({ onNavigate }) {
 
         const user = matchingUsers[0];
         if (user.Password === loginPwd) {
-            // Log active login timestamp and status row in SheetDB
+            // Log active login timestamp and status row in SheetDB & Backend terminal
             await saveUserToDatabase(user.Name || 'User', user.Email, user.Password, 'Email/Password', 'Logged In');
 
             localStorage.setItem('gitaverse_user_name', user.Name || 'Seeker');

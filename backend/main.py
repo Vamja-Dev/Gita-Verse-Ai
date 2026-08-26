@@ -1,13 +1,30 @@
+# backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
 from routes.chat import router as chat_router
-from routes.shlokas import router as shlokas_router  # <--- Import the new shlokas router
+from routes.shlokas import router as shlokas_router
+from routes.chapters import router as chapters_router
+from routes.auth_logger import router as auth_logger_router
+from syncSheet import sync_google_sheet
 
 load_dotenv()
 
-app = FastAPI(title="GitaVerse AI Backend", version="1.0.0")
+# Modern FastAPI Lifespan event handler (replaces deprecated @app.on_event("startup"))
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Code to run on startup
+    print("Running automatic Google Sheet sync...")
+    try:
+        sync_google_sheet()
+    except Exception as e:
+        print(f"Startup sync encountered an issue: {e}")
+    yield
+    # Code to run on shutdown (if any)
+
+app = FastAPI(title="GitaVerse AI Backend", version="1.0.0", lifespan=lifespan)
 
 # Setup CORS for Vite React development server
 app.add_middleware(
@@ -19,7 +36,9 @@ app.add_middleware(
 )
 
 app.include_router(chat_router, prefix="/api")
-app.include_router(shlokas_router, prefix="/api")  # <--- Mount the shlokas router under /api
+app.include_router(shlokas_router, prefix="/api")
+app.include_router(chapters_router, prefix="/api")
+app.include_router(auth_logger_router, prefix="/api")
 
 @app.get("/api/health")
 def health_check():

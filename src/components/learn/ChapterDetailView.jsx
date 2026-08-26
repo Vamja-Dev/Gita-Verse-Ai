@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, AlertCircle, X } from 'lucide-react';
-import { shlokasData } from '../../data/shlokasData';
+import { shlokasData as fallbackShlokasData } from '../../data/shlokasData';
 import { chaptersData } from '../../data/chaptersData';
 import GitaAudioPlayer, { stopGlobalAudio } from '../../components/GitaAudioPlayer';
 import SpeechButton from '../../components/SpeechButton';
@@ -15,11 +15,43 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [savedShlokasMap, setSavedShlokasMap] = useState({});
     
+    // State for verses fetched from MongoDB backend API
+    const [verses, setVerses] = useState([]);
+    const [loadingVerses, setLoadingVerses] = useState(true);
+
     // State to track which real-life example tab (1 to 5) is currently open in the scroll modal
     const [activeExampleTab, setActiveExampleTab] = useState('1');
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [chapterNumber]);
+
+    // Fetch shlokas from FastAPI MongoDB backend for this specific chapter
+    useEffect(() => {
+        async function fetchChapterShlokas() {
+            setLoadingVerses(true);
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/shlokas?chapter=${chapterNumber}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        setVerses(data);
+                    } else {
+                        // Fallback to static JS file if MongoDB collection returns empty for this chapter
+                        setVerses(fallbackShlokasData[chapterNumber] || []);
+                    }
+                } else {
+                    setVerses(fallbackShlokasData[chapterNumber] || []);
+                }
+            } catch (error) {
+                console.warn('Backend API offline, using local static shlokas backup:', error);
+                setVerses(fallbackShlokasData[chapterNumber] || []);
+            } finally {
+                setLoadingVerses(false);
+            }
+        }
+
+        fetchChapterShlokas();
     }, [chapterNumber]);
 
     // Stop any playing audio if the user switches chapters or leaves the view
@@ -50,8 +82,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     const userName = localStorage.getItem('gitaverse_user_name');
     const isLoggedIn = userEmail && userEmail !== 'N/A' && userName && userName !== 'Seeker';
 
-    const verses = shlokasData[chapterNumber] || [];
-
     // Open target shloka modal ONLY when arriving from dashboard with a targetShloka
     useEffect(() => {
         if (targetShloka && verses.length > 0) {
@@ -61,7 +91,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                 setActiveExampleTab('1');
             }
         }
-    }, [chapterNumber, targetShloka]);
+    }, [chapterNumber, targetShloka, verses]);
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -213,7 +243,11 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
 
                 {/* Shlokas Displayed as Ancient Manuscript Verses */}
                 <div className="grid grid-cols-1 gap-6">
-                    {filteredVerses.length > 0 ? (
+                    {loadingVerses ? (
+                        <div className="text-center py-16 text-[#7c5a3c] text-sm font-sans animate-pulse">
+                            Loading shlokas from MongoDB database...
+                        </div>
+                    ) : filteredVerses.length > 0 ? (
                         filteredVerses.map((shloka) => {
                             const uniqueId = `ch-${chapterNumber}-vs-${shloka.shloka_number}`;
                             const isSaved = !!savedShlokasMap[uniqueId];
@@ -242,7 +276,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-sans font-bold transition-all ${isSaved
                                                     ? 'bg-[#3d2314] text-amber-300 border-amber-500'
                                                     : 'bg-[#faebd7] text-[#5c3a21] border-[#8c5a3c]/40 hover:bg-[#ecd0a8]'
-                                                    }`}
+                                                }`}
                                                 title={isSaved ? "Saved in Dashboard" : "Save Shloka"}
                                             >
                                                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current text-amber-400' : ''}`} />
@@ -333,7 +367,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                             className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-xs font-sans font-bold transition-all shadow cursor-pointer ${savedShlokasMap[`ch-${chapterNumber}-vs-${selectedShloka.shloka_number}`]
                                                 ? 'bg-[#3d2314] text-amber-300 border-amber-500'
                                                 : 'bg-[#faebd7] text-[#5c3a21] border-[#8c5a3c]/50 hover:bg-[#ecd0a8]'
-                                                }`}
+                                            }`}
                                         >
                                             <Bookmark className={`w-4 h-4 ${savedShlokasMap[`ch-${chapterNumber}-vs-${selectedShloka.shloka_number}`] ? 'fill-current text-amber-400' : ''}`} />
                                             <span>{savedShlokasMap[`ch-${chapterNumber}-vs-${selectedShloka.shloka_number}`] ? 'Saved' : 'Save Shloka'}</span>
@@ -437,7 +471,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                             💡 Real-Life Application / Examples (1 - 5)
                                         </h4>
                                         
-                                        {/* Tab Buttons for Example 1, 2, 3, 4, 5 */}
                                         <div className="flex items-center gap-1.5 bg-[#d4b087] p-1 rounded-xl border border-[#8c5a3c]/40">
                                             {['1', '2', '3', '4', '5'].map((num) => (
                                                 <button
@@ -455,7 +488,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                         </div>
                                     </div>
 
-                                    {/* Active Example Content Display for English, Hindi, and Gujarati */}
                                     {selectedShloka.real_life_example && selectedShloka.real_life_example[activeExampleTab] && (
                                         <div className="grid grid-cols-1 gap-3 text-sm">
                                             <div className="p-4 rounded-lg bg-[#ecd0a8]/70 border-2 border-[#8c5a3c]/50 space-y-3 shadow-inner">

@@ -22,7 +22,6 @@ def get_chapters():
     try:
         chapters = list(chapters_collection.find({}, {"_id": False}))
         
-        # If the chapters collection is empty, dynamically group unique chapters from your 701 shlokas
         if not chapters:
             pipeline = [
                 {"$group": {
