@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 from routes.chat import router as chat_router
+from routes.shlokas import router as shlokas_router  # <--- Import the new shlokas router
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(chat_router, prefix="/api")
+app.include_router(shlokas_router, prefix="/api")  # <--- Mount the shlokas router under /api
 
 @app.get("/api/health")
 def health_check():

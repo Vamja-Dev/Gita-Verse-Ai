@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import BackgroundManager from '../components/background/BackgroundManager';
 import LearnHero from '../components/learn/LearnHero';
@@ -6,13 +6,37 @@ import JourneyTimeline from '../components/learn/JourneyTimeline';
 import SearchBar from '../components/learn/SearchBar';
 import FilterBar from '../components/learn/FilterBar';
 import ChapterGrid from '../components/learn/ChapterGrid';
-import { chaptersData } from '../data/chaptersData';
+import { chaptersData as fallbackChaptersData } from '../data/chaptersData'; // Permanent backup fallback
 
 export default function LearnGita({ onNavigate, onSelectChapter }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All Chapters');
+  const [chapters, setChapters] = useState(fallbackChaptersData);
+  const [loading, setLoading] = useState(true);
 
-  const filteredChapters = chaptersData.filter((chapter) => {
+  // Fetch chapters from MongoDB backend API with fallback support
+  useEffect(() => {
+    async function fetchChaptersFromAPI() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/chapters');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            setChapters(data);
+          }
+        }
+      } catch (error) {
+        console.warn('Backend API offline, using permanent local JS backup dataset:', error);
+        // Keeps fallbackChaptersData automatically
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchChaptersFromAPI();
+  }, []);
+
+  const filteredChapters = chapters.filter((chapter) => {
     const term = searchTerm ? searchTerm.toLowerCase().trim() : '';
     const chapNum = Number(chapter.number || chapter.chapter_number || 0);
     const engName = (chapter.englishName || chapter.name || '').toLowerCase();
