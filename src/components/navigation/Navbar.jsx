@@ -1,11 +1,13 @@
+// src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { primaryMenuItems, exploreSubmenus } from '../../data/menuItems';
 import { usePageTheme } from '../../hooks/usePageTheme';
-import { saveUserToDatabase } from '../../pages/LoginPage';
 import logoImage from '../../assets/logo.png';
 import '../../styles/navigation.css';
+
+const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-log';
 
 export default function Navbar({ currentPage, onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,11 +55,21 @@ export default function Navbar({ currentPage, onNavigate }) {
     setShowLogoutDropdown(false);
   };
 
-  // Updated Logout handler to save 'Logged Out' status & timestamp to Google Sheet via SheetDB
+  // Updated Logout handler to notify FastAPI backend (which logs out to both MongoDB & SheetDB instantly)
   const handleLogout = async () => {
     if (userEmail && userEmail !== 'N/A') {
       try {
-        await saveUserToDatabase(userName, userEmail, 'N/A', 'Session Activity', 'Logged Out');
+        await fetch(BACKEND_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: userName,
+            email: userEmail,
+            password: 'N/A',
+            method: 'Session Activity',
+            status: 'Logged Out'
+          })
+        });
       } catch (error) {
         console.error('Error logging logout session:', error);
       }

@@ -382,3 +382,21 @@ body {
     margin-bottom: auto;
   }
 }
+
+/* Add these styles to the bottom of your login.css */
+.form-pane.logged-in-pane {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 40px !important;
+}
+
+.form-pane.logged-in-pane h2,
+.form-pane.logged-in-pane p {
+  text-align: center !important;
+  width: 100% !important;
+  text-transform: none !important;
+}

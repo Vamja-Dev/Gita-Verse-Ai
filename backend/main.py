@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
+import threading
+import time
 from dotenv import load_dotenv
 from routes.chat import router as chat_router
 from routes.shlokas import router as shlokas_router
@@ -12,17 +14,30 @@ from syncSheet import sync_google_sheet
 
 load_dotenv()
 
-# Modern FastAPI Lifespan event handler (replaces deprecated @app.on_event("startup"))
+def background_sheet_sync_worker():
+    """Background loop that automatically syncs Google Sheets to MongoDB every 30 seconds"""
+    while True:
+        try:
+            sync_google_sheet()
+        except Exception as e:
+            print(f"❌ [AUTO-SYNC ERROR]: {e}")
+        time.sleep(30)  # Checks and syncs every 30 seconds automatically
+
+# Modern FastAPI Lifespan event handler with background auto-sync thread
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Code to run on startup
-    print("Running automatic Google Sheet sync...")
+    print("Running initial automatic Google Sheet sync...")
     try:
         sync_google_sheet()
     except Exception as e:
         print(f"Startup sync encountered an issue: {e}")
+        
+    # Start the background sync thread
+    sync_thread = threading.Thread(target=background_sheet_sync_worker, daemon=True)
+    sync_thread.start()
+    print("🚀 [SERVER STARTUP] Background Google Sheet auto-sync worker started successfully!")
+    
     yield
-    # Code to run on shutdown (if any)
 
 app = FastAPI(title="GitaVerse AI Backend", version="1.0.0", lifespan=lifespan)
 

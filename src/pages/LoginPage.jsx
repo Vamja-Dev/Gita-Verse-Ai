@@ -6,74 +6,18 @@ import krishna from '../assets/krishna.png';
 import bgImg from '../assets/bg.png';
 import '../styles/login.css';
 
-const SHEETDB_URL = 'https://sheetdb.io/api/v1/x84p8m28inivm';
 const GOOGLE_CLIENT_ID = '168266196166-0jl5nj5lhv0qvmj539k6bvekjo3romkt.apps.googleusercontent.com';
 const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-log';
-
-// Helper to notify FastAPI backend so it prints in the terminal and logs to MongoDB
-export const sendAuthLogToBackend = async (name, email, method, status) => {
-    try {
-        await fetch(BACKEND_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                method: method,
-                status: status
-            })
-        });
-    } catch (error) {
-        console.error('Error notifying FastAPI backend auth log:', error);
-    }
-};
-
-// Reusable database save function for Google Sheets (SheetDB)
-export const saveUserToDatabase = async (name, email, password, loginMethod, status) => {
-    try {
-        const response = await fetch(SHEETDB_URL);
-        const allRows = await response.json();
-        
-        let nextId = 1;
-        if (Array.isArray(allRows) && allRows.length > 0) {
-            const ids = allRows.map(row => Number(row.ID || row.id || row[0])).filter(id => !isNaN(id) && id > 0);
-            if (ids.length > 0) {
-                nextId = Math.max(...ids) + 1;
-            } else {
-                nextId = allRows.length + 1;
-            }
-        }
-
-        const postResponse = await fetch(SHEETDB_URL, {
-            method: 'POST',
-            headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: [{
-                    "ID": nextId,
-                    "Name": name,
-                    "Email": email,
-                    "Password": password,
-                    "Method": loginMethod,
-                    "Status": status,
-                    "Date": new Date().toLocaleString()
-                }]
-            })
-        });
-        const result = await postResponse.json();
-
-        // ALSO trigger backend terminal log & MongoDB sync instantly
-        await sendAuthLogToBackend(name, email, loginMethod, status);
-
-        return result;
-    } catch (error) {
-        console.error('Error saving to SheetDB/Backend:', error);
-    }
-};
 
 export default function LoginPage({ onNavigate }) {
     const [isRegister, setIsRegister] = useState(false);
     const [showLoginPwd, setShowLoginPwd] = useState(false);
     const [showRegPwd, setShowRegPwd] = useState(false);
+
+    // Check if a user is already actively logged in via localStorage
+    const activeUserName = localStorage.getItem('gitaverse_user_name');
+    const activeUserEmail = localStorage.getItem('gitaverse_user_email');
+    const isAlreadyLoggedIn = activeUserName && activeUserName !== 'Seeker' && activeUserEmail && activeUserEmail !== 'N/A';
 
     // Form states
     const [loginUser, setLoginUser] = useState('');
@@ -115,13 +59,35 @@ export default function LoginPage({ onNavigate }) {
     // Helper validation
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    const searchUserInSheet = async (email) => {
+    // Fetch all logs from FastAPI backend to check existing users/passwords securely
+    const fetchAllUsersFromBackend = async () => {
         try {
-            const response = await fetch(`${SHEETDB_URL}/search?Email=${encodeURIComponent(email)}`);
+            const response = await fetch(BACKEND_API_URL);
+            const result = await response.json();
+            return result.data || [];
+        } catch (error) {
+            console.error('Error fetching logs from backend:', error);
+            return [];
+        }
+    };
+
+    // Unified function to send auth logs securely to FastAPI backend (which updates MongoDB & Google Sheets safely)
+    const sendAuthLog = async (name, email, password, method, status) => {
+        try {
+            const response = await fetch(BACKEND_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: password,
+                    method: method,
+                    status: status
+                })
+            });
             return await response.json();
         } catch (error) {
-            console.error('Error querying SheetDB:', error);
-            return [];
+            console.error('Error sending auth log to backend:', error);
         }
     };
 
@@ -140,19 +106,20 @@ export default function LoginPage({ onNavigate }) {
                         const userName = responsePayload.name;
                         const userEmail = responsePayload.email;
 
-                        const existingUsers = await searchUserInSheet(userEmail);
-                        if (!existingUsers || existingUsers.length === 0) {
-                            await saveUserToDatabase(userName, userEmail, 'N/A (Google OAuth)', 'Google OAuth', 'Registered');
+                        const allUsers = await fetchAllUsersFromBackend();
+                        const existingUser = allUsers.find(u => u.Email === userEmail);
+
+                        if (!existingUser) {
+                            await sendAuthLog(userName, userEmail, 'N/A (Google OAuth)', 'Google OAuth', 'Registered');
                         }
 
-                        // Log activity status as Logged In with timestamp (updates SheetDB + Backend Terminal)
-                        await saveUserToDatabase(userName, userEmail, 'N/A', 'Google OAuth', 'Logged In');
+                        // Log active login status
+                        await sendAuthLog(userName, userEmail, 'N/A', 'Google OAuth', 'Logged In');
 
-                        // Store Google User Name and Email in LocalStorage
+                        // Store in LocalStorage
                         localStorage.setItem('gitaverse_user_name', userName);
                         localStorage.setItem('gitaverse_user_email', userEmail);
 
-                        // Redirect instantly to home
                         if (onNavigate) onNavigate('home');
                     }
                 });
@@ -198,20 +165,20 @@ export default function LoginPage({ onNavigate }) {
         }
 
         setRegError('Checking availability...');
-        const existingUsers = await searchUserInSheet(regEmail);
-        if (existingUsers && existingUsers.length > 0) {
+        const allUsers = await fetchAllUsersFromBackend();
+        const emailExists = allUsers.some(u => u.Email === regEmail);
+
+        if (emailExists) {
             setRegError('This email is already registered. Please login.');
             return;
         }
 
         setRegError('Creating account & logging in...');
         try {
-            // Save as Registered first (updates SheetDB + MongoDB backend)
-            await saveUserToDatabase(regName, regEmail, regPwd, 'Email/Password', 'Registered');
-            // Also log the active login session immediately
-            await saveUserToDatabase(regName, regEmail, regPwd, 'Email/Password', 'Logged In');
+            // Single clean request to backend handles both DB and Google Sheet sync safely
+            await sendAuthLog(regName, regEmail, regPwd, 'Email/Password', 'Registered');
+            await sendAuthLog(regName, regEmail, regPwd, 'Email/Password', 'Logged In');
 
-            // Store user details in LocalStorage
             localStorage.setItem('gitaverse_user_name', regName);
             localStorage.setItem('gitaverse_user_email', regEmail);
 
@@ -233,17 +200,16 @@ export default function LoginPage({ onNavigate }) {
         }
 
         setLoginError('Verifying credentials...');
-        const matchingUsers = await searchUserInSheet(loginUser);
+        const allUsers = await fetchAllUsersFromBackend();
+        const user = allUsers.find(u => u.Email === loginUser || u.Name === loginUser);
 
-        if (!matchingUsers || matchingUsers.length === 0) {
+        if (!user) {
             setLoginError('No account found with this email. Please Sign Up first.');
             return;
         }
 
-        const user = matchingUsers[0];
         if (user.Password === loginPwd) {
-            // Log active login timestamp and status row in SheetDB & Backend terminal
-            await saveUserToDatabase(user.Name || 'User', user.Email, user.Password, 'Email/Password', 'Logged In');
+            await sendAuthLog(user.Name || 'User', user.Email, user.Password, 'Email/Password', 'Logged In');
 
             localStorage.setItem('gitaverse_user_name', user.Name || 'Seeker');
             localStorage.setItem('gitaverse_user_email', user.Email);
@@ -277,129 +243,157 @@ export default function LoginPage({ onNavigate }) {
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >
-                        <div
-                            className="form-slider"
-                            style={{ transform: `translateZ(40px) translateX(${isRegister ? '-50%' : '0'})` }}
-                        >
-
-                            {/* LOGIN PANE */}
-                            <form className="form-pane" onSubmit={handleLoginSubmit} noValidate>
-                                <h2>Login</h2>
-                                <p className="sub">Access your GitaVerse AI account</p>
-
-                                <div className="field">
-                                    <span className="icon">👤</span>
-                                    <input
-                                        type="text"
-                                        value={loginUser}
-                                        onChange={(e) => setLoginUser(e.target.value)}
-                                        placeholder="Username or Email"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="field">
-                                    <span className="icon">🔒</span>
-                                    <input
-                                        type={showLoginPwd ? 'text' : 'password'}
-                                        value={loginPwd}
-                                        onChange={(e) => setLoginPwd(e.target.value)}
-                                        placeholder="Password"
-                                        required
-                                    />
-                                    <button type="button" className="toggle" onClick={() => setShowLoginPwd(!showLoginPwd)}>
-                                        {showLoginPwd ? '🙈' : '👁️'}
+                        {isAlreadyLoggedIn ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-center p-8" style={{ minHeight: '380px' }}>
+                                <h2 className="text-amber-300 font-serif text-3xl mb-3" style={{ textTransform: 'none' }}>Already Logged In</h2>
+                                <p className="text-amber-100/90 text-sm mb-3" style={{ textTransform: 'none' }}>
+                                    You are currently signed in as <strong className="text-amber-400">{activeUserName}</strong>
+                                </p>
+                                <p className="text-xs text-amber-200/80 leading-relaxed mb-6 max-w-[280px]" style={{ textTransform: 'none', letterSpacing: 'normal' }}>
+                                    Please log out if you wish to log/sign into another account.
+                                </p>
+                                <div className="w-full max-w-[240px]">
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                await sendAuthLog(activeUserName, activeUserEmail, 'N/A', 'Session Activity', 'Logged Out');
+                                            } catch (err) {
+                                                console.error('Logout logging error:', err);
+                                            }
+                                            localStorage.removeItem('gitaverse_user_name');
+                                            localStorage.removeItem('gitaverse_user_email');
+                                            if (onNavigate) onNavigate('home');
+                                        }}
+                                        className="btn-submit w-full py-3 cursor-pointer bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all shadow-lg"
+                                        style={{ textTransform: 'none' }}
+                                    >
+                                        Logout 🚪
                                     </button>
                                 </div>
+                            </div>
+                        ) : (
+                            <div
+                                className="form-slider"
+                                style={{ transform: `translateZ(40px) translateX(${isRegister ? '-50%' : '0'})` }}
+                            >
+                                {/* LOGIN PANE */}
+                                <form className="form-pane" onSubmit={handleLoginSubmit} noValidate>
+                                    <h2>Login</h2>
+                                    <p className="sub">Access your GitaVerse AI account</p>
 
-                                <p className="error-msg">{loginError}</p>
+                                    <div className="field">
+                                        <span className="icon">👤</span>
+                                        <input
+                                            type="text"
+                                            value={loginUser}
+                                            onChange={(e) => setLoginUser(e.target.value)}
+                                            placeholder="Username or Email"
+                                            required
+                                        />
+                                    </div>
 
-                                <button type="submit" className="btn-submit" style={{ marginTop: '10px' }}>
-                                    Login
-                                </button>
+                                    <div className="field">
+                                        <span className="icon">🔒</span>
+                                        <input
+                                            type={showLoginPwd ? 'text' : 'password'}
+                                            value={loginPwd}
+                                            onChange={(e) => setLoginPwd(e.target.value)}
+                                            placeholder="Password"
+                                            required
+                                        />
+                                        <button type="button" className="toggle" onClick={() => setShowLoginPwd(!showLoginPwd)}>
+                                            {showLoginPwd ? '🙈' : '👁️'}
+                                        </button>
+                                    </div>
 
-                                <div className="divider">OR</div>
+                                    <p className="error-msg">{loginError}</p>
 
-                                <button type="button" className="btn-google flex items-center justify-center gap-2" onClick={handleGoogleClick}>
-                                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.4 5.5-5.1 7.2v6h8.2c4.8-4.4 7.2-10.8 7.2-17.5z" />
-                                        <path fill="#34A853" d="M24 48c6.6 0 12.1-2.2 16.2-5.9l-8.2-6c-2.2 1.5-4.9 2.4-8 2.4-6.2 0-11.5-4.2-13.4-9.9H2.1v6.2C6.2 42.7 14.5 48 24 48z" />
-                                        <path fill="#FBBC05" d="M10.6 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6v-6.2H2.1C.8 16.1 0 19.9 0 24s.8 7.9 2.1 10.8l8.5-6.2z" />
-                                        <path fill="#EA4335" d="M24 9.5c3.6 0 6.8 1.2 9.3 3.6l7-7C36.1 2.2 30.6 0 24 0 14.5 0 6.2 5.3 2.1 13.2l8.5 6.2C12.5 13.7 17.8 9.5 24 9.5z" />
-                                    </svg>
-                                    <span>Continue with Google</span>
-                                </button>
-
-                                <p className="switch-mode">
-                                    Don't have an account? <a onClick={() => setIsRegister(true)}>Register</a>
-                                </p>
-                            </form>
-
-                            {/* REGISTER PANE */}
-                            <form className="form-pane" onSubmit={handleRegisterSubmit} noValidate>
-                                <h2>Sign Up</h2>
-                                <p className="sub">Begin your divine journey</p>
-
-                                <div className="field">
-                                    <span className="icon">👤</span>
-                                    <input
-                                        type="text"
-                                        value={regName}
-                                        onChange={(e) => setRegName(e.target.value)}
-                                        placeholder="Full Name"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="field">
-                                    <span className="icon">✉️</span>
-                                    <input
-                                        type="email"
-                                        value={regEmail}
-                                        onChange={(e) => setRegEmail(e.target.value)}
-                                        placeholder="Email Address"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="field">
-                                    <span className="icon">🔒</span>
-                                    <input
-                                        type={showRegPwd ? 'text' : 'password'}
-                                        value={regPwd}
-                                        onChange={(e) => setRegPwd(e.target.value)}
-                                        placeholder="Password"
-                                        required
-                                    />
-                                    <button type="button" className="toggle" onClick={() => setShowRegPwd(!showRegPwd)}>
-                                        {showRegPwd ? '🙈' : '👁️'}
+                                    <button type="submit" className="btn-submit" style={{ marginTop: '10px' }}>
+                                        Login
                                     </button>
-                                </div>
 
-                                <p className="error-msg">{regError}</p>
+                                    <div className="divider">OR</div>
 
-                                <button type="submit" className="btn-submit">
-                                    Create Account
-                                </button>
+                                    <button type="button" className="btn-google flex items-center justify-center gap-2" onClick={handleGoogleClick}>
+                                        <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.4 5.5-5.1 7.2v6h8.2c4.8-4.4 7.2-10.8 7.2-17.5z" />
+                                            <path fill="#34A853" d="M24 48c6.6 0 12.1-2.2 16.2-5.9l-8.2-6c-2.2 1.5-4.9 2.4-8 2.4-6.2 0-11.5-4.2-13.4-9.9H2.1v6.2C6.2 42.7 14.5 48 24 48z" />
+                                            <path fill="#FBBC05" d="M10.6 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6v-6.2H2.1C.8 16.1 0 19.9 0 24s.8 7.9 2.1 10.8l8.5-6.2z" />
+                                            <path fill="#EA4335" d="M24 9.5c3.6 0 6.8 1.2 9.3 3.6l7-7C36.1 2.2 30.6 0 24 0 14.5 0 6.2 5.3 2.1 13.2l8.5 6.2C12.5 13.7 17.8 9.5 24 9.5z" />
+                                        </svg>
+                                        <span>Continue with Google</span>
+                                    </button>
 
-                                <div className="divider">OR</div>
+                                    <p className="switch-mode">
+                                        Don't have an account? <a onClick={() => setIsRegister(true)}>Register</a>
+                                    </p>
+                                </form>
 
-                                <button type="button" className="btn-google flex items-center justify-center gap-2" onClick={handleGoogleClick}>
-                                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.4 5.5-5.1 7.2v6h8.2c4.8-4.4 7.2-10.8 7.2-17.5z" />
-                                        <path fill="#34A853" d="M24 48c6.6 0 12.1-2.2 16.2-5.9l-8.2-6c-2.2 1.5-4.9 2.4-8 2.4-6.2 0-11.5-4.2-13.4-9.9H2.1v6.2C6.2 42.7 14.5 48 24 48z" />
-                                        <path fill="#FBBC05" d="M10.6 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6v-6.2H2.1C.8 16.1 0 19.9 0 24s.8 7.9 2.1 10.8l8.5-6.2z" />
-                                        <path fill="#EA4335" d="M24 9.5c3.6 0 6.8 1.2 9.3 3.6l7-7C36.1 2.2 30.6 0 24 0 14.5 0 6.2 5.3 2.1 13.2l8.5 6.2C12.5 13.7 17.8 9.5 24 9.5z" />
-                                    </svg>
-                                    <span>Sign up with Google</span>
-                                </button>
+                                {/* REGISTER PANE */}
+                                <form className="form-pane" onSubmit={handleRegisterSubmit} noValidate>
+                                    <h2>Sign Up</h2>
+                                    <p className="sub">Begin your divine journey</p>
 
-                                <p className="switch-mode">
-                                    Already have an account? <a onClick={() => setIsRegister(false)}>Login</a>
-                                </p>
-                            </form>
+                                    <div className="field">
+                                        <span className="icon">👤</span>
+                                        <input
+                                            type="text"
+                                            value={regName}
+                                            onChange={(e) => setRegName(e.target.value)}
+                                            placeholder="Full Name"
+                                            required
+                                        />
+                                    </div>
 
-                        </div>
+                                    <div className="field">
+                                        <span className="icon">✉️</span>
+                                        <input
+                                            type="email"
+                                            value={regEmail}
+                                            onChange={(e) => setRegEmail(e.target.value)}
+                                            placeholder="Email Address"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="field">
+                                        <span className="icon">🔒</span>
+                                        <input
+                                            type={showRegPwd ? 'text' : 'password'}
+                                            value={regPwd}
+                                            onChange={(e) => setRegPwd(e.target.value)}
+                                            placeholder="Password"
+                                            required
+                                        />
+                                        <button type="button" className="toggle" onClick={() => setShowRegPwd(!showRegPwd)}>
+                                            {showRegPwd ? '🙈' : '👁️'}
+                                        </button>
+                                    </div>
+
+                                    <p className="error-msg">{regError}</p>
+
+                                    <button type="submit" className="btn-submit">
+                                        Create Account
+                                    </button>
+
+                                    <div className="divider">OR</div>
+
+                                    <button type="button" className="btn-google flex items-center justify-center gap-2" onClick={handleGoogleClick}>
+                                        <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill="#4285F4" d="M47.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h13.2c-.6 3-2.4 5.5-5.1 7.2v6h8.2c4.8-4.4 7.2-10.8 7.2-17.5z" />
+                                            <path fill="#34A853" d="M24 48c6.6 0 12.1-2.2 16.2-5.9l-8.2-6c-2.2 1.5-4.9 2.4-8 2.4-6.2 0-11.5-4.2-13.4-9.9H2.1v6.2C6.2 42.7 14.5 48 24 48z" />
+                                            <path fill="#FBBC05" d="M10.6 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6v-6.2H2.1C.8 16.1 0 19.9 0 24s.8 7.9 2.1 10.8l8.5-6.2z" />
+                                            <path fill="#EA4335" d="M24 9.5c3.6 0 6.8 1.2 9.3 3.6l7-7C36.1 2.2 30.6 0 24 0 14.5 0 6.2 5.3 2.1 13.2l8.5 6.2C12.5 13.7 17.8 9.5 24 9.5z" />
+                                        </svg>
+                                        <span>Sign up with Google</span>
+                                    </button>
+
+                                    <p className="switch-mode">
+                                        Already have an account? <a onClick={() => setIsRegister(false)}>Login</a>
+                                    </p>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
