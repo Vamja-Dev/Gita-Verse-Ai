@@ -25,7 +25,8 @@ export default function UserDashboard({ onNavigate }) {
 
   const handleDelete = (id) => {
     if (window.confirm(`Are you sure you want to delete log ID ${id}?`)) {
-      axios.get(`http://localhost:8000/api/auth-logs/id/${id}`)
+      // Fixed: changed axios.get to axios.delete
+      axios.delete(`http://localhost:8000/api/auth-logs/id/${id}`)
         .then(() => {
           alert("Log deleted successfully.");
           fetchLogs();
@@ -40,7 +41,7 @@ export default function UserDashboard({ onNavigate }) {
         <h1 className="text-2xl font-bold">USER ACTIVITY & AUTH LOGS</h1>
         <button 
           onClick={() => onNavigate('admin')} 
-          className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium transition"
+          className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium transition cursor-pointer"
         >
           ← Dashboard
         </button>
@@ -89,7 +90,7 @@ export default function UserDashboard({ onNavigate }) {
                     <td className="p-3 text-right">
                       <button 
                         onClick={() => handleDelete(log.ID)}
-                        className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium transition"
+                        className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium transition cursor-pointer"
                       >
                         DELETE
                       </button>

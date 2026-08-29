@@ -7,6 +7,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
   const [shloka, setShloka] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [lastChangeSummary, setLastChangeSummary] = useState(null);
 
   useEffect(() => {
     if (!shlokaId) return;
@@ -23,13 +24,19 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
 
   const handleSave = () => {
     setSaving(true);
+    setLastChangeSummary(null);
+
     axios.put(`http://localhost:8000/api/admin/shlokas/${shlokaId}`, shloka)
-      .then(() => {
-        alert("Shloka updated successfully!");
+      .then((res) => {
         setSaving(false);
+        if (res.data && res.data.summary) {
+          setLastChangeSummary(res.data.summary);
+        }
+        alert("Shloka updated successfully!");
         onNavigate('admin/shlokas');
       })
       .catch(err => {
+        console.error("Failed to update shloka:", err);
         alert("Failed to update shloka.");
         setSaving(false);
       });
@@ -45,18 +52,26 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
         <div className="flex gap-2">
           <button 
             onClick={() => onNavigate('admin')} 
-            className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-medium transition"
+            className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-medium transition cursor-pointer"
           >
             ← Dashboard
           </button>
           <button 
             onClick={() => onNavigate('admin/shlokas')} 
-            className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm font-medium border border-gray-700 transition"
+            className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm font-medium border border-gray-700 transition cursor-pointer"
           >
             Shloka List
           </button>
         </div>
       </div>
+
+      {/* Live Change Audit Panel */}
+      {lastChangeSummary && (
+        <div className="mb-6 p-4 bg-gray-900 border border-amber-500/40 rounded-lg shadow-lg">
+          <p className="text-xs uppercase text-amber-400 tracking-wider font-semibold">Latest Edit Log:</p>
+          <p className="text-sm mt-1 text-gray-200">{lastChangeSummary}</p>
+        </div>
+      )}
 
       <div className="space-y-8 bg-gray-900 p-8 rounded-lg border border-gray-800 shadow-xl">
         {/* SECTION 1: CORE TEXT */}
@@ -151,10 +166,10 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
 
         {/* ACTIONS */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-800">
-          <button onClick={() => onNavigate('admin/shlokas')} className="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded font-semibold text-sm transition">
+          <button onClick={() => onNavigate('admin/shlokas')} className="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded font-semibold text-sm transition cursor-pointer">
             Cancel
           </button>
-          <button onClick={handleSave} disabled={saving} className="bg-amber-600 hover:bg-amber-700 px-8 py-2.5 rounded font-semibold text-sm transition">
+          <button onClick={handleSave} disabled={saving} className="bg-amber-600 hover:bg-amber-700 px-8 py-2.5 rounded font-semibold text-sm transition cursor-pointer">
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>

@@ -7,7 +7,7 @@ import bgImg from '../assets/bg.png';
 import '../styles/login.css';
 
 const GOOGLE_CLIENT_ID = '168266196166-0jl5nj5lhv0qvmj539k6bvekjo3romkt.apps.googleusercontent.com';
-const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-log';
+const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-logs';
 
 export default function LoginPage({ onNavigate }) {
     const [isRegister, setIsRegister] = useState(false);

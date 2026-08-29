@@ -7,7 +7,7 @@ import { usePageTheme } from '../../hooks/usePageTheme';
 import logoImage from '../../assets/logo.png';
 import '../../styles/navigation.css';
 
-const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-log';
+const BACKEND_API_URL = 'http://127.0.0.1:8000/api/auth-logs';
 
 export default function Navbar({ currentPage, onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

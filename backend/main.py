@@ -5,28 +5,15 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 import os
-import threading
-import time
 from dotenv import load_dotenv
 from routes.chat import router as chat_router
 from routes.shlokas import router as shlokas_router
 from routes.chapters import router as chapters_router
 from routes.auth_logger import router as auth_logger_router
 from routes.admin_routes import router as admin_router
-from syncSheet import sync_google_sheet
 from database.connection import get_db
 
 load_dotenv()
-
-def background_sheet_sync_worker():
-    """Background loop that automatically syncs Google Sheets to MongoDB every 15 minutes to avoid rate limits"""
-    time.sleep(15)  # Wait 15 seconds after server boot before firing the first sync request
-    while True:
-        try:
-            sync_google_sheet()
-        except Exception as e:
-            print(f"❌ [AUTO-SYNC ERROR]: {e}")
-        time.sleep(900)  # 900 seconds (15 minutes)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,9 +24,7 @@ async def lifespan(app: FastAPI):
         print(f"❌ [CRITICAL DB ERROR]: {e}")
         raise e
     
-    sync_thread = threading.Thread(target=background_sheet_sync_worker, daemon=True)
-    sync_thread.start()
-    print("🚀 [SERVER STARTUP] Background Google Sheet auto-sync worker started successfully!")
+    print("🚀 [SERVER STARTUP] Running on MongoDB primary storage!")
     
     yield
 

@@ -10,7 +10,6 @@ export default function AdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Calls backend endpoint to print "Admin login success" in Terminal 1
       await axios.post('http://localhost:8000/api/admin/login', {
         email,
         password
@@ -24,16 +23,16 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh] text-white login-container">
-      <form onSubmit={handleLogin} className="bg-gray-900 border border-gray-800 p-8 rounded-lg w-full max-w-md shadow-lg">
-        <h2 className="text-2xl font-bold mb-6 text-amber-500 text-center">Admin Login</h2>
+    <div className="flex justify-center items-center min-h-[80vh] text-white admin-login-wrapper">
+      <form onSubmit={handleLogin} className="glass-panel bg-gray-900 border border-gray-800 p-8 rounded-lg w-full max-w-md shadow-lg">
+        <h2 className="text-2xl font-bold mb-6 text-amber-500 text-center font-['Cinzel']">Admin Login</h2>
         <div className="mb-4">
           <label className="block text-sm text-gray-400 mb-2">Email</label>
           <input 
             type="email" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white"
+            className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
             required
           />
         </div>
@@ -43,7 +42,7 @@ export default function AdminLogin() {
             type={showPassword ? "text" : "password"} 
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white"
+            className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
             required
           />
         </div>
@@ -59,7 +58,7 @@ export default function AdminLogin() {
             Show Password
           </label>
         </div>
-        <button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 py-3 rounded font-bold transition">
+        <button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 py-3 rounded font-bold transition text-white cursor-pointer">
           Login
         </button>
       </form>
