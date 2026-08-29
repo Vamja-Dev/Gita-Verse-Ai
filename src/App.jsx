@@ -17,7 +17,7 @@ import UserDashboard from './pages/UserDashboard';
 import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 
-// NEW: Admin Panel Imports
+// Admin Panel Imports
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 import Chapters from './pages/admin/Chapters';
@@ -26,6 +26,7 @@ import Shlokas from './pages/admin/Shlokas';
 import ShlokaEditor from './pages/admin/ShlokaEditor';
 import Images from './pages/admin/Images';
 import ImageUploader from './pages/admin/ImageUploader';
+import UserDashboardAdmin from './pages/admin/UserDashboard';
 
 // Import all 18 chapter images
 import chp1 from './assets/images/ch-1.jpg';
@@ -59,29 +60,59 @@ export default function App() {
   const [selectedShlokaNum, setSelectedShlokaNum] = useState(null);
   const [selectedShlokaId, setSelectedShlokaId] = useState(null);
 
-  // Always start as false so the intro loader plays fresh on every refresh/reload
+  // Track admin authentication status securely in session/state
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    return sessionStorage.getItem('gita_admin_auth') === 'true';
+  });
+
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
-  // Handle URL paths for direct admin panel access on load / refresh
+  // Handle URL paths and force login redirection if visiting /admin directly without credentials
   useEffect(() => {
     const path = window.location.pathname;
     if (path.startsWith('/admin')) {
-      setCurrentPage(path.substring(1)); // e.g., 'admin', 'admin/chapters', 'admin/shlokas', etc.
+      if (path === '/admin' && !isAdminAuthenticated) {
+        setCurrentPage('admin/login');
+        window.history.replaceState({}, '', '/admin/login');
+      } else {
+        setCurrentPage(path.substring(1));
+      }
     }
 
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, []);
+  }, [isAdminAuthenticated]);
 
   const handleCompleteIntro = () => {
     setHasSeenIntro(true);
   };
 
-  // Robust router handler supporting direct chapter & target shloka navigation from Dashboard and Admin Panel
   const handleUniversalNavigate = (pageOrAction, payload) => {
-    // Handle dynamic shloka editor routing: /admin/shlokas/:id/edit
+    // Block direct dashboard access if unauthenticated
+    if (pageOrAction.startsWith('admin') && pageOrAction !== 'admin/login' && !isAdminAuthenticated) {
+      setCurrentPage('admin/login');
+      window.history.pushState({}, '', '/admin/login');
+      return;
+    }
+
+    if (pageOrAction === 'admin-logout') {
+      setIsAdminAuthenticated(false);
+      sessionStorage.removeItem('gita_admin_auth');
+      setCurrentPage('admin/login');
+      window.history.pushState({}, '', '/admin/login');
+      return;
+    }
+
+    if (pageOrAction === 'admin-success') {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem('gita_admin_auth', 'true');
+      setCurrentPage('admin');
+      window.history.pushState({}, '', '/admin');
+      return;
+    }
+
     if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/shlokas/') && pageOrAction.endsWith('/edit')) {
       const parts = pageOrAction.split('/');
       setSelectedShlokaId(parts[2]);
@@ -106,7 +137,6 @@ export default function App() {
     } else {
       setSelectedShlokaNum(null);
       setCurrentPage(pageOrAction);
-      // Sync browser URL for admin paths seamlessly
       if (pageOrAction.startsWith('admin')) {
         window.history.pushState({}, '', `/${pageOrAction}`);
       } else if (pageOrAction === 'home') {
@@ -116,17 +146,14 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  // Determine if navbar should be hidden on admin views
   const isAdminRoute = currentPage.startsWith('admin');
 
   return (
     <div className="relative min-h-screen w-full bg-[#1a0f08] overflow-x-hidden">
-      {/* Render IntroLoader whenever the page is freshly loaded (Skipped on Admin views) */}
       {!hasSeenIntro && !isAdminRoute && (
         <IntroLoader onComplete={handleCompleteIntro} />
       )}
 
-      {/* Global Navbar (Hidden on Admin screens for clean workspace layout) */}
       {!isAdminRoute && (
         <Navbar
           currentPage={currentPage}
@@ -134,39 +161,51 @@ export default function App() {
         />
       )}
 
-      {/* Main Page Router View */}
       <main className="w-full">
         {/* ================= ADMIN ROUTES ================= */}
-        {currentPage === 'admin' && (
-          <AdminDashboard onNavigate={handleUniversalNavigate} />
-        )}
-
         {currentPage === 'admin/login' && (
           <AdminLogin onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/chapters' && (
+        {currentPage === 'admin' && (
+          isAdminAuthenticated ? (
+            <AdminDashboard onNavigate={handleUniversalNavigate} />
+          ) : (
+            <AdminLogin onNavigate={handleUniversalNavigate} />
+          )
+        )}
+
+        {currentPage === 'admin/chapters' && isAdminAuthenticated && (
           <Chapters onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/chapter-editor' && (
+        {currentPage === 'admin/chapter-editor' && isAdminAuthenticated && (
           <ChapterEditor onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/shlokas' && (
+        {currentPage === 'admin/shlokas' && isAdminAuthenticated && (
           <Shlokas onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/shloka-edit' && (
+        {currentPage === 'admin/shloka-edit' && isAdminAuthenticated && (
           <ShlokaEditor shlokaId={selectedShlokaId} onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/images' && (
+        {currentPage === 'admin/images' && isAdminAuthenticated && (
           <Images onNavigate={handleUniversalNavigate} />
         )}
 
-        {currentPage === 'admin/image-uploader' && (
+        {currentPage === 'admin/image-uploader' && isAdminAuthenticated && (
           <ImageUploader onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/dashboard' && isAdminAuthenticated && (
+          <UserDashboardAdmin onNavigate={handleUniversalNavigate} />
+        )}
+
+        {/* Fallback protection if unauthenticated user hits any admin sub-route directly */}
+        {isAdminRoute && currentPage !== 'admin/login' && !isAdminAuthenticated && (
+          <AdminLogin onNavigate={handleUniversalNavigate} />
         )}
 
         {/* ================= USER WEBSITE ROUTES ================= */}
@@ -241,7 +280,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Global Scroll to Top Button (Hidden on Admin screens) */}
       {!isAdminRoute && <ScrollToTop />}
     </div>
   );

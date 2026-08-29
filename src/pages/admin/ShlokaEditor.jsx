@@ -41,9 +41,20 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
     <div className="p-6 max-w-5xl mx-auto text-white">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Edit Shloka {shloka.chapter_number}.{shloka.shloka_number}</h1>
-        <button onClick={() => onNavigate('admin/shlokas')} className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium">
-          Back to List
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => onNavigate('admin')} 
+            className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-medium transition"
+          >
+            ← Dashboard
+          </button>
+          <button 
+            onClick={() => onNavigate('admin/shlokas')} 
+            className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm font-medium border border-gray-700 transition"
+          >
+            Shloka List
+          </button>
+        </div>
       </div>
 
       <div className="space-y-8 bg-gray-900 p-8 rounded-lg border border-gray-800 shadow-xl">
@@ -56,7 +67,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
               <textarea 
                 value={shloka.sanskrit || ''} 
                 onChange={(e) => setShloka({...shloka, sanskrit: e.target.value})}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-24 font-serif"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-24 font-serif focus:outline-none focus:border-amber-500"
               />
             </div>
             <div>
@@ -64,7 +75,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
               <textarea 
                 value={shloka.transliteration || ''} 
                 onChange={(e) => setShloka({...shloka, transliteration: e.target.value})}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-20"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-20 focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -83,7 +94,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
                     ...shloka, 
                     translations: { ...shloka.translations, [lang]: e.target.value }
                   })}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-32 text-sm"
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-32 text-sm focus:outline-none focus:border-amber-500"
                 />
               </div>
             ))}
@@ -103,7 +114,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
                     ...shloka, 
                     explanations: { ...shloka.explanations, [lang]: e.target.value }
                   })}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-36 text-sm"
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white h-36 text-sm focus:outline-none focus:border-amber-500"
                 />
               </div>
             ))}
@@ -128,7 +139,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
                         updatedExamples[exNum][lang] = e.target.value;
                         setShloka({ ...shloka, real_life_example: updatedExamples });
                       }}
-                      className="w-full p-2.5 bg-gray-800 border border-gray-700 rounded text-white h-24 text-xs"
+                      className="w-full p-2.5 bg-gray-800 border border-gray-700 rounded text-white h-24 text-xs focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 ))}
@@ -139,7 +150,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
 
         {/* ACTIONS */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-800">
-          <button onClick={() => onNavigate('admin/shlokas')} className="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded font-semibold text-sm">
+          <button onClick={() => onNavigate('admin/shlokas')} className="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded font-semibold text-sm transition">
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving} className="bg-amber-600 hover:bg-amber-700 px-8 py-2.5 rounded font-semibold text-sm transition">

@@ -1,6 +1,7 @@
 # backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import os
 import threading
@@ -17,13 +18,14 @@ from database.connection import get_db
 load_dotenv()
 
 def background_sheet_sync_worker():
-    """Background loop that automatically syncs Google Sheets to MongoDB every 30 seconds"""
+    """Background loop that automatically syncs Google Sheets to MongoDB every 15 minutes to avoid rate limits"""
+    time.sleep(15)  # Wait 15 seconds after server boot before firing the first sync request
     while True:
         try:
             sync_google_sheet()
         except Exception as e:
             print(f"❌ [AUTO-SYNC ERROR]: {e}")
-        time.sleep(30)
+        time.sleep(900)  # 900 seconds (15 minutes)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,12 +36,8 @@ async def lifespan(app: FastAPI):
         print(f"❌ [CRITICAL DB ERROR]: {e}")
         raise e
 
-    print("Running initial automatic Google Sheet sync...")
-    try:
-        sync_google_sheet()
-    except Exception as e:
-        print(f"Startup sync encountered an issue: {e}")
-        
+    # Startup sync call removed to prevent duplicate 429 rate-limit errors with SheetDB
+    
     sync_thread = threading.Thread(target=background_sheet_sync_worker, daemon=True)
     sync_thread.start()
     print("🚀 [SERVER STARTUP] Background Google Sheet auto-sync worker started successfully!")
@@ -55,6 +53,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount uploads folder to serve admin media files publicly
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(chat_router, prefix="/api")
 app.include_router(shlokas_router, prefix="/api")

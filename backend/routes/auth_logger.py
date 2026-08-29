@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-router = APIRouter(prefix="/auth-log", tags=["Auth Logger"])
+router = APIRouter(prefix="/auth-logs", tags=["Auth Logger"])
 
 MONGO_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME = os.getenv("MONGODB_DB_NAME", "gitaverse")
@@ -43,7 +43,6 @@ def log_user_activity(data: AuthLogModel):
         current_time = datetime.now()
         current_time_str = current_time.strftime("%m/%d/%Y, %I:%M:%S %p")
         
-        # Check the absolute latest entry for this email to evaluate rapid double-submittals
         latest_doc = users_collection.find_one({"Email": data.email}, sort=[("_id", -1)])
         
         if latest_doc and latest_doc.get("Status") == data.status and latest_doc.get("Method") == data.method:
@@ -52,14 +51,12 @@ def log_user_activity(data: AuthLogModel):
                 last_time = datetime.strptime(last_date_str, "%m/%d/%Y, %I:%M:%S %p")
                 time_diff = (current_time - last_time).total_seconds()
                 
-                # If an identical event was logged less than 5 seconds ago, reject it instantly
                 if time_diff < 5:
                     print(f"🛑 [DUPLICATE BLOCKED] Blocked rapid double-log for {data.email} ({data.status}) within {int(time_diff)}s.")
                     return {"status": "skipped", "message": "Duplicate event blocked by backend guard."}
             except Exception:
                 pass
 
-        # Calculate next auto-increment ID cleanly
         highest_id = 0
         for doc in users_collection.find({}, {"ID": 1}):
             try:
@@ -81,10 +78,8 @@ def log_user_activity(data: AuthLogModel):
             "Status": data.status
         }
 
-        # 1. Save to MongoDB Primary Storage
         users_collection.insert_one(log_document)
 
-        # 2. Save to Google Sheets Primary Storage (via SheetDB)
         sheet_payload = {
             "data": [{
                 "ID": new_id,
@@ -96,11 +91,11 @@ def log_user_activity(data: AuthLogModel):
                 "Status": data.status
             }]
         }
-        sheet_response = requests.post(SHEETDB_URL, json=sheet_payload, timeout=10)
+        requests.post(SHEETDB_URL, json=sheet_payload, timeout=10)
         
         print(f"\n==========================================")
         print(f"🔥 [DUAL-PRIMARY WRITE SUCCESS]")
-        print(f"🆔 ID     : {new_id}")
+        print(f"🆔 ID    : {new_id}")
         print(f"👤 Name   : {data.name}")
         print(f"📧 Email  : {data.email}")
         print(f"⚡ Status : {data.status}")
@@ -112,10 +107,10 @@ def log_user_activity(data: AuthLogModel):
 
 @router.get("/id/{row_id}")
 def delete_user_by_id(row_id: str):
-    """Dual-Primary DELETE BY ID (GET method for browser testing): Deletes from MongoDB & Google Sheets"""
+    """Dual-Primary DELETE BY ID: Deletes from MongoDB & Google Sheets"""
     try:
         users_collection.delete_one({"ID": str(row_id)})
-        sheet_response = requests.delete(f"{SHEETDB_URL}/ID/{requests.utils.quote(str(row_id))}", timeout=10)
+        requests.delete(f"{SHEETDB_URL}/ID/{requests.utils.quote(str(row_id))}", timeout=10)
 
         print(f"\n🗑️ [DUAL-PRIMARY DELETE SUCCESS] Removed ID: {row_id} from MongoDB and Google Sheets.\n")
         return {"status": "success", "message": f"Successfully deleted ID {row_id} from both storages."}
@@ -124,10 +119,10 @@ def delete_user_by_id(row_id: str):
 
 @router.get("/email/{email}")
 def delete_user_by_email(email: str):
-    """Dual-Primary DELETE BY EMAIL (GET method for browser testing): Deletes from MongoDB & Google Sheets"""
+    """Dual-Primary DELETE BY EMAIL: Deletes from MongoDB & Google Sheets"""
     try:
         users_collection.delete_many({"Email": email})
-        sheet_response = requests.delete(f"{SHEETDB_URL}/Email/{requests.utils.quote(email)}", timeout=10)
+        requests.delete(f"{SHEETDB_URL}/Email/{requests.utils.quote(email)}", timeout=10)
 
         print(f"\n🗑️ [DUAL-PRIMARY DELETE BY EMAIL] Removed Email: {email} from MongoDB and Google Sheets.\n")
         return {"status": "success", "message": f"Successfully deleted records for {email} from both storages."}

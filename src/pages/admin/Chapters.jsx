@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function Chapters() {
+export default function Chapters({ onNavigate }) {
   const [chapters, setChapters] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -49,9 +49,20 @@ export default function Chapters() {
     <div className="p-6 max-w-7xl mx-auto text-white">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">CHAPTER MANAGEMENT</h1>
-        <button className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-semibold text-sm">
-          + ADD CHAPTER
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => onNavigate('admin')} 
+            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold text-sm transition"
+          >
+            ← Dashboard
+          </button>
+          <button 
+            onClick={() => onNavigate('admin/chapter-editor')} 
+            className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-semibold text-sm transition"
+          >
+            + ADD CHAPTER
+          </button>
+        </div>
       </div>
 
       {error && <div className="mb-4 p-3 bg-red-900 text-red-200 rounded">{error}</div>}
@@ -81,12 +92,15 @@ export default function Chapters() {
               <p className="text-gray-300 text-sm mt-3 line-clamp-3">{ch.description}</p>
             </div>
             <div className="mt-5 flex justify-end gap-2 border-t border-gray-800 pt-3">
-              <button className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1.5 rounded font-medium">
+              <button 
+                onClick={() => onNavigate('admin/chapter-editor')}
+                className="bg-blue-600 hover:bg-blue-700 text-xs px-3 py-1.5 rounded font-medium transition"
+              >
                 EDIT
               </button>
               <button 
                 onClick={() => handleDelete(ch.chapter_number)}
-                className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium"
+                className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium transition"
               >
                 DELETE
               </button>

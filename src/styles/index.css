@@ -17,10 +17,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Scoped strictly to login elements so the rest of the entire website frontend remains 100% untouched */
+.login-container input, 
+.login-container label, 
+.login-container button {
+  font-family: 'Inter', sans-serif !important;
+  text-transform: none !important;
+}
+
 /* Glassmorphism Classes */
-/* Glassmorphism Styling - Lower Transparency */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.08) !important; /* Highly transparent */
+  background: rgba(15, 23, 42, 0.08) !important;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(245, 158, 11, 0.25) !important;
@@ -33,6 +40,7 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
+
 .gold-text-glow {
   text-shadow: 0 0 15px rgba(245, 158, 11, 0.6), 0 0 30px rgba(245, 158, 11, 0.3);
 }

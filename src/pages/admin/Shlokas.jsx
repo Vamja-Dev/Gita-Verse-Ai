@@ -33,8 +33,11 @@ export default function Shlokas({ onNavigate }) {
     <div className="p-6 max-w-7xl mx-auto text-white">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">SHLOKA MANAGEMENT</h1>
-        <button onClick={() => onNavigate('admin')} className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium">
-          Back to Dashboard
+        <button 
+          onClick={() => onNavigate('admin')} 
+          className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm font-medium transition"
+        >
+          ← Dashboard
         </button>
       </div>
       
@@ -44,19 +47,22 @@ export default function Shlokas({ onNavigate }) {
           placeholder="Search Sanskrit or Transliteration..." 
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded text-white"
+          className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
         />
         <select 
           value={chapter} 
           onChange={(e) => setChapter(e.target.value)}
-          className="p-3 bg-gray-800 border border-gray-700 rounded text-white"
+          className="p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
         >
           <option value="">All Chapters</option>
           {[...Array(18)].map((_, i) => (
             <option key={i+1} value={i+1}>Chapter {i+1}</option>
           ))}
         </select>
-        <button onClick={fetchShlokas} className="bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded font-semibold">
+        <button 
+          onClick={fetchShlokas} 
+          className="bg-amber-600 hover:bg-amber-700 px-6 py-3 rounded font-semibold transition"
+        >
           SEARCH
         </button>
       </div>
@@ -66,7 +72,7 @@ export default function Shlokas({ onNavigate }) {
       ) : (
         <div className="space-y-3">
           {shlokas.map((s) => (
-            <div key={s._id} className="bg-gray-900 border border-gray-800 p-4 rounded flex justify-between items-center">
+            <div key={s._id} className="bg-gray-900 border border-gray-800 p-4 rounded flex justify-between items-center shadow">
               <div>
                 <span className="text-amber-400 font-bold">Chapter {s.chapter_number}, Verse {s.shloka_number}</span>
                 <p className="text-gray-300 text-sm mt-1 line-clamp-1 font-serif">{s.sanskrit}</p>

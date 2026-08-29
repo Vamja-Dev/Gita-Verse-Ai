@@ -14,14 +14,21 @@ client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 users_collection = db["users_sheet_logs"]
 
-# Use SheetDB API for instant, real-time live data (bypasses Google's CSV cache entirely)
+# Use SheetDB API for instant, real-time live data
 SHEETDB_URL = "https://sheetdb.io/api/v1/x84p8m28inivm"
 
 def sync_google_sheet():
-    """Fetches live data instantly via SheetDB API, upserts by ID, and purges deleted rows by ID."""
+    """Fetches live data instantly via SheetDB API, upserts by ID, and purges deleted rows by ID with rate-limit protection."""
     try:
         print("Fetching latest data via SheetDB API...")
-        response = requests.get(SHEETDB_URL, timeout=10)
+        headers = {"User-Agent": "GitaVerse-Backend-Sync/1.0"}
+        response = requests.get(SHEETDB_URL, headers=headers, timeout=10)
+        
+        # Handle rate limits gracefully without breaking application threads
+        if response.status_code == 429:
+            print("⚠️ [SHEETDB RATE LIMITED]: Free tier limit hit (429 Too Many Requests). Skipping this sync cycle.")
+            return
+            
         response.raise_for_status()
 
         rows = response.json()
@@ -35,10 +42,8 @@ def sync_google_sheet():
         synced_count = 0
 
         for row in rows:
-            # Clean keys and values
             cleaned_row = {str(k).strip(): (str(v).strip() if v is not None else "") for k, v in row.items() if k}
             
-            # Find the ID key dynamically
             row_id = None
             for key in cleaned_row.keys():
                 if key.lower() == 'id':
@@ -53,7 +58,6 @@ def sync_google_sheet():
                 
             sheet_ids.add(row_id)
                 
-            # Upsert into MongoDB collection matching the exact ID
             users_collection.update_one(
                 {"ID": row_id},
                 {"$set": cleaned_row},
@@ -61,8 +65,6 @@ def sync_google_sheet():
             )
             synced_count += 1
 
-        # TWO-WAY RECONCILIATION BY ID:
-        # Remove any document from MongoDB whose ID is no longer present in SheetDB
         delete_result = users_collection.delete_many({
             "ID": {"$exists": True, "$nin": list(sheet_ids)},
             "Method": {"$ne": "Session Activity"}
@@ -71,9 +73,12 @@ def sync_google_sheet():
         print(f"Successfully synced {synced_count} active rows into MongoDB (`users_sheet_logs`)!")
         if delete_result.deleted_count > 0:
             print(f"🗑️ Cleaned up {delete_result.deleted_count} deleted rows from MongoDB based on ID mismatch.")
-        else:
-            print("Cleaned up 0 rows (IDs are fully synchronized).")
 
+    except requests.exceptions.HTTPError as he:
+        if he.response.status_code == 429:
+            print("⚠️ [SHEETDB RATE LIMITED]: 429 Too Many Requests encountered.")
+        else:
+            print(f"HTTP Error syncing SheetDB: {he}")
     except Exception as e:
         print(f"Error syncing SheetDB: {e}")
 
