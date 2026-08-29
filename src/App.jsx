@@ -17,6 +17,16 @@ import UserDashboard from './pages/UserDashboard';
 import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 
+// NEW: Admin Panel Imports
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminLogin from './pages/admin/AdminLogin';
+import Chapters from './pages/admin/Chapters';
+import ChapterEditor from './pages/admin/ChapterEditor';
+import Shlokas from './pages/admin/Shlokas';
+import ShlokaEditor from './pages/admin/ShlokaEditor';
+import Images from './pages/admin/Images';
+import ImageUploader from './pages/admin/ImageUploader';
+
 // Import all 18 chapter images
 import chp1 from './assets/images/ch-1.jpg';
 import chp2 from './assets/images/ch-2.jpg';
@@ -47,12 +57,18 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedChapterNum, setSelectedChapterNum] = useState(1);
   const [selectedShlokaNum, setSelectedShlokaNum] = useState(null);
+  const [selectedShlokaId, setSelectedShlokaId] = useState(null);
 
   // Always start as false so the intro loader plays fresh on every refresh/reload
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
 
-  // Force scroll position to top on initial load/refresh and disable browser scroll memory
+  // Handle URL paths for direct admin panel access on load / refresh
   useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/admin')) {
+      setCurrentPage(path.substring(1)); // e.g., 'admin', 'admin/chapters', 'admin/shlokas', etc.
+    }
+
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -63,8 +79,18 @@ export default function App() {
     setHasSeenIntro(true);
   };
 
-  // Robust router handler supporting direct chapter & target shloka navigation from Dashboard
+  // Robust router handler supporting direct chapter & target shloka navigation from Dashboard and Admin Panel
   const handleUniversalNavigate = (pageOrAction, payload) => {
+    // Handle dynamic shloka editor routing: /admin/shlokas/:id/edit
+    if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/shlokas/') && pageOrAction.endsWith('/edit')) {
+      const parts = pageOrAction.split('/');
+      setSelectedShlokaId(parts[2]);
+      setCurrentPage('admin/shloka-edit');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.history.pushState({}, '', `/${pageOrAction}`);
+      return;
+    }
+
     if (pageOrAction === 'shloka-detail-direct' && payload) {
       setSelectedChapterNum(payload.chapterNumber);
       setSelectedShlokaNum(payload.shlokaNumber);
@@ -80,25 +106,70 @@ export default function App() {
     } else {
       setSelectedShlokaNum(null);
       setCurrentPage(pageOrAction);
+      // Sync browser URL for admin paths seamlessly
+      if (pageOrAction.startsWith('admin')) {
+        window.history.pushState({}, '', `/${pageOrAction}`);
+      } else if (pageOrAction === 'home') {
+        window.history.pushState({}, '', '/');
+      }
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
+  // Determine if navbar should be hidden on admin views
+  const isAdminRoute = currentPage.startsWith('admin');
+
   return (
     <div className="relative min-h-screen w-full bg-[#1a0f08] overflow-x-hidden">
-      {/* Render IntroLoader whenever the page is freshly loaded */}
-      {!hasSeenIntro && (
+      {/* Render IntroLoader whenever the page is freshly loaded (Skipped on Admin views) */}
+      {!hasSeenIntro && !isAdminRoute && (
         <IntroLoader onComplete={handleCompleteIntro} />
       )}
 
-      {/* Global Navbar */}
-      <Navbar
-        currentPage={currentPage}
-        onNavigate={handleUniversalNavigate}
-      />
+      {/* Global Navbar (Hidden on Admin screens for clean workspace layout) */}
+      {!isAdminRoute && (
+        <Navbar
+          currentPage={currentPage}
+          onNavigate={handleUniversalNavigate}
+        />
+      )}
 
       {/* Main Page Router View */}
       <main className="w-full">
+        {/* ================= ADMIN ROUTES ================= */}
+        {currentPage === 'admin' && (
+          <AdminDashboard onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/login' && (
+          <AdminLogin onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/chapters' && (
+          <Chapters onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/chapter-editor' && (
+          <ChapterEditor onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/shlokas' && (
+          <Shlokas onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/shloka-edit' && (
+          <ShlokaEditor shlokaId={selectedShlokaId} onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/images' && (
+          <Images onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/image-uploader' && (
+          <ImageUploader onNavigate={handleUniversalNavigate} />
+        )}
+
+        {/* ================= USER WEBSITE ROUTES ================= */}
         {currentPage === 'home' && (
           <Home onNavigate={handleUniversalNavigate} />
         )}
@@ -170,8 +241,8 @@ export default function App() {
         )}
       </main>
 
-      {/* Global Scroll to Top Button */}
-      <ScrollToTop />
+      {/* Global Scroll to Top Button (Hidden on Admin screens) */}
+      {!isAdminRoute && <ScrollToTop />}
     </div>
   );
 }

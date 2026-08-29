@@ -10,7 +10,9 @@ from routes.chat import router as chat_router
 from routes.shlokas import router as shlokas_router
 from routes.chapters import router as chapters_router
 from routes.auth_logger import router as auth_logger_router
+from routes.admin_routes import router as admin_router
 from syncSheet import sync_google_sheet
+from database.connection import get_db
 
 load_dotenv()
 
@@ -21,18 +23,23 @@ def background_sheet_sync_worker():
             sync_google_sheet()
         except Exception as e:
             print(f"❌ [AUTO-SYNC ERROR]: {e}")
-        time.sleep(30)  # Checks and syncs every 30 seconds automatically
+        time.sleep(30)
 
-# Modern FastAPI Lifespan event handler with background auto-sync thread
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("Connecting to local MongoDB instance...")
+    try:
+        get_db()
+    except Exception as e:
+        print(f"❌ [CRITICAL DB ERROR]: {e}")
+        raise e
+
     print("Running initial automatic Google Sheet sync...")
     try:
         sync_google_sheet()
     except Exception as e:
         print(f"Startup sync encountered an issue: {e}")
         
-    # Start the background sync thread
     sync_thread = threading.Thread(target=background_sheet_sync_worker, daemon=True)
     sync_thread.start()
     print("🚀 [SERVER STARTUP] Background Google Sheet auto-sync worker started successfully!")
@@ -41,7 +48,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="GitaVerse AI Backend", version="1.0.0", lifespan=lifespan)
 
-# Setup CORS for Vite React development server
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -54,6 +60,7 @@ app.include_router(chat_router, prefix="/api")
 app.include_router(shlokas_router, prefix="/api")
 app.include_router(chapters_router, prefix="/api")
 app.include_router(auth_logger_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
 
 @app.get("/api/health")
 def health_check():
