@@ -7,6 +7,7 @@ export default function ImageUploader({ onNavigate }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Chapter Artwork');
   const [chapterNumber, setChapterNumber] = useState('');
+  const [slotNumber, setSlotNumber] = useState('1');
   const [altText, setAltText] = useState('');
   const [uploading, setUploading] = useState(false);
 
@@ -21,7 +22,12 @@ export default function ImageUploader({ onNavigate }) {
     formData.append('file', file);
     formData.append('name', name);
     formData.append('category', category);
-    if (chapterNumber) formData.append('chapterNumber', chapterNumber);
+    if (category === 'Chapter Artwork' && chapterNumber) {
+      formData.append('chapterNumber', chapterNumber);
+    }
+    if (category === 'Homepage' && slotNumber) {
+      formData.append('slotNumber', slotNumber);
+    }
     formData.append('altText', altText);
 
     setUploading(true);
@@ -46,13 +52,13 @@ export default function ImageUploader({ onNavigate }) {
         <div className="flex gap-2">
           <button 
             onClick={() => onNavigate('admin')} 
-            className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-medium transition"
+            className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-medium transition cursor-pointer"
           >
             ← Dashboard
           </button>
           <button 
             onClick={() => onNavigate('admin/images')} 
-            className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm font-medium border border-gray-700 transition"
+            className="bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm font-medium border border-gray-700 transition cursor-pointer"
           >
             Back to Library
           </button>
@@ -65,7 +71,7 @@ export default function ImageUploader({ onNavigate }) {
           <input 
             type="file" 
             onChange={(e) => setFile(e.target.files[0])}
-            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none" 
+            className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none cursor-pointer" 
           />
         </div>
         <div>
@@ -75,7 +81,7 @@ export default function ImageUploader({ onNavigate }) {
             value={name} 
             onChange={(e) => setName(e.target.value)}
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
-            placeholder="Chapter 1 Artwork"
+            placeholder="e.g. Homepage Hero Variant 2"
           />
         </div>
         <div>
@@ -86,13 +92,14 @@ export default function ImageUploader({ onNavigate }) {
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
           >
             <option value="Chapter Artwork">Chapter Artwork</option>
+            <option value="Homepage">Homepage (Rotating Slot)</option>
             <option value="Character">Character</option>
             <option value="Veda">Veda</option>
             <option value="Yuga">Yuga</option>
-            <option value="Homepage">Homepage</option>
             <option value="Other">Other</option>
           </select>
         </div>
+
         {category === 'Chapter Artwork' && (
           <div>
             <label className="block text-sm text-gray-400 mb-1">Chapter Number (1-18)</label>
@@ -105,6 +112,23 @@ export default function ImageUploader({ onNavigate }) {
             />
           </div>
         )}
+
+        {category === 'Homepage' && (
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">Homepage Slot (1, 2, or 3)</label>
+            <select 
+              value={slotNumber} 
+              onChange={(e) => setSlotNumber(e.target.value)}
+              className="w-full p-3 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="1">Slot 1 (Hero/Banner Primary)</option>
+              <option value="2">Slot 2 (Featured Section Secondary)</option>
+              <option value="3">Slot 3 (Background/Ambient Visual)</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Upload up to 5 unique images per slot to allow random rotations on homepage visits.</p>
+          </div>
+        )}
+
         <div>
           <label className="block text-sm text-gray-400 mb-1">Alt Text</label>
           <input 
@@ -118,7 +142,7 @@ export default function ImageUploader({ onNavigate }) {
         <button 
           type="submit" 
           disabled={uploading} 
-          className="w-full bg-amber-600 hover:bg-amber-700 py-3 rounded font-bold transition"
+          className="w-full bg-amber-600 hover:bg-amber-700 py-3 rounded font-bold transition cursor-pointer"
         >
           {uploading ? 'UPLOADING...' : 'UPLOAD TO SERVER'}
         </button>

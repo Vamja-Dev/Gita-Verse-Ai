@@ -6,6 +6,7 @@ import ScrollToTopButton from './ScrollToTopButton';
 export default function Images({ onNavigate }) {
   const [mediaList, setMediaList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const fetchMedia = () => {
     axios.get('http://localhost:8000/api/admin/media')
@@ -34,6 +35,12 @@ export default function Images({ onNavigate }) {
     }
   };
 
+  const categories = ['All', 'Chapter Artwork', 'Homepage', 'Character', 'Veda', 'Yuga', 'Other'];
+
+  const filteredMedia = selectedCategory === 'All' 
+    ? mediaList 
+    : mediaList.filter(m => m.category === selectedCategory);
+
   return (
     <div className="p-6 max-w-7xl mx-auto text-white relative min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -41,28 +48,45 @@ export default function Images({ onNavigate }) {
         <div className="flex gap-3">
           <button 
             onClick={() => onNavigate('admin')} 
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold text-sm transition"
+            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold text-sm transition cursor-pointer"
           >
             ← Dashboard
           </button>
           <button 
             onClick={() => onNavigate('admin/image-uploader')} 
-            className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-semibold text-sm transition"
+            className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded font-semibold text-sm transition cursor-pointer"
           >
             + UPLOAD IMAGE
           </button>
         </div>
       </div>
 
+      {/* Category Filter Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-800 pb-4">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3 py-1.5 rounded text-xs font-semibold transition cursor-pointer ${
+              selectedCategory === cat 
+                ? 'bg-amber-600 text-white' 
+                : 'bg-gray-900 text-gray-400 hover:bg-gray-800 border border-gray-800'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div className="text-gray-400">Loading media library...</div>
-      ) : mediaList.length === 0 ? (
+      ) : filteredMedia.length === 0 ? (
         <div className="bg-gray-900 border border-gray-800 p-8 rounded-lg text-center text-gray-400 shadow">
-          No images uploaded yet. Click upload to add chapter artwork or website media.
+          No images found in this category. Click upload to add new visuals.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {mediaList.map((m) => (
+          {filteredMedia.map((m) => (
             <div key={m._id} className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden shadow flex flex-col justify-between">
               <div className="h-40 bg-gray-950 flex items-center justify-center overflow-hidden">
                 <img src={`http://localhost:8000${m.url}`} alt={m.altText || m.name} className="object-cover h-full w-full" />
@@ -71,12 +95,13 @@ export default function Images({ onNavigate }) {
                 <div>
                   <h3 className="font-bold text-md text-amber-400">{m.name}</h3>
                   <p className="text-xs text-gray-400 mt-1">Category: {m.category}</p>
+                  {m.slotNumber && <p className="text-xs text-amber-500 font-medium">Homepage Slot: #{m.slotNumber}</p>}
                   {m.chapterNumber && <p className="text-xs text-gray-400">Chapter: {m.chapterNumber}</p>}
                 </div>
                 <div className="mt-4 flex justify-end gap-2 border-t border-gray-800 pt-3">
                   <button 
                     onClick={() => handleDelete(m._id, m.name)} 
-                    className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium transition"
+                    className="bg-red-600 hover:bg-red-700 text-xs px-3 py-1.5 rounded font-medium transition cursor-pointer"
                   >
                     DELETE
                   </button>
@@ -87,7 +112,6 @@ export default function Images({ onNavigate }) {
         </div>
       )}
 
-      {/* Floating Go to Top Button */}
       <ScrollToTopButton />
     </div>
   );
