@@ -1,6 +1,7 @@
 // src/pages/admin/Shlokas.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ScrollToTopButton from './ScrollToTopButton';
 
 export default function Shlokas({ onNavigate }) {
   const [shlokas, setShlokas] = useState([]);
@@ -30,7 +31,7 @@ export default function Shlokas({ onNavigate }) {
   }, [chapter]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto text-white">
+    <div className="p-6 max-w-7xl mx-auto text-white relative min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">SHLOKA MANAGEMENT</h1>
         <button 
@@ -87,6 +88,9 @@ export default function Shlokas({ onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* Floating Go to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
 }

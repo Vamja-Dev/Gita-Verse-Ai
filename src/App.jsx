@@ -74,6 +74,14 @@ export default function App() {
       if (path === '/admin' && !isAdminAuthenticated) {
         setCurrentPage('admin/login');
         window.history.replaceState({}, '', '/admin/login');
+      } else if (path.startsWith('/admin/chapters/') && path.endsWith('/edit')) {
+        const parts = path.split('/');
+        setSelectedChapterNum(parts[2]);
+        setCurrentPage('admin/chapter-edit');
+      } else if (path.startsWith('/admin/shlokas/') && path.endsWith('/edit')) {
+        const parts = path.split('/');
+        setSelectedShlokaId(parts[2]);
+        setCurrentPage('admin/shloka-edit');
       } else {
         setCurrentPage(path.substring(1));
       }
@@ -110,6 +118,15 @@ export default function App() {
       sessionStorage.setItem('gita_admin_auth', 'true');
       setCurrentPage('admin');
       window.history.pushState({}, '', '/admin');
+      return;
+    }
+
+    if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/chapters/') && pageOrAction.endsWith('/edit')) {
+      const parts = pageOrAction.split('/');
+      setSelectedChapterNum(parts[2]);
+      setCurrentPage('admin/chapter-edit');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.history.pushState({}, '', `/${pageOrAction}`);
       return;
     }
 
@@ -181,6 +198,10 @@ export default function App() {
 
         {currentPage === 'admin/chapter-editor' && isAdminAuthenticated && (
           <ChapterEditor onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/chapter-edit' && isAdminAuthenticated && (
+          <ChapterEditor chapterNumber={selectedChapterNum} onNavigate={handleUniversalNavigate} />
         )}
 
         {currentPage === 'admin/shlokas' && isAdminAuthenticated && (

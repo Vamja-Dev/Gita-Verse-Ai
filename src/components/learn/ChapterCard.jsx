@@ -1,3 +1,4 @@
+// src/components/learn/ChapterCard.jsx
 import React from 'react';
 
 export default function ChapterCard({ chapter, onClick }) {
@@ -15,7 +16,6 @@ export default function ChapterCard({ chapter, onClick }) {
     >
       {/* 3D BOOK SPINE WITH RIDGE BINDINGS ON THE LEFT */}
       <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-amber-950 via-amber-900 to-amber-950 border-r-2 border-amber-950 shadow-2xl flex flex-col justify-around py-2">
-        {/* Spine Ribs / Raised Bands */}
         <div className="w-full h-1.5 bg-gradient-to-r from-amber-950 via-amber-700 to-amber-950 shadow-md border-y border-amber-950/60" />
         <div className="w-full h-1.5 bg-gradient-to-r from-amber-950 via-amber-700 to-amber-950 shadow-md border-y border-amber-950/60" />
         <div className="w-full h-1.5 bg-gradient-to-r from-amber-950 via-amber-700 to-amber-950 shadow-md border-y border-amber-950/60" />
@@ -32,17 +32,17 @@ export default function ChapterCard({ chapter, onClick }) {
           Chapter {chapterId}
         </span>
         <span className="text-xs font-serif text-amber-200/80 italic">
-          {chapter.verses_count || chapter.totalShlokas || 40} Shlokas
+          {chapter.shloka_count || chapter.verses_count || chapter.totalShlokas || 40} Shlokas
         </span>
       </div>
       
       {/* Chapter Titles */}
       <div className="my-auto pl-4">
         <h3 className="text-base md:text-lg font-serif font-bold text-amber-100 group-hover:text-amber-300 transition-colors leading-snug">
-          {chapter.englishName || chapter.name}
+          {chapter.name || chapter.englishName}
         </h3>
         <p className="text-xs md:text-sm text-amber-200/70 font-serif mt-1">
-          {chapter.sanskritName || chapter.name_meaning}
+          {chapter.slug || chapter.sanskritName || chapter.name_meaning}
         </p>
       </div>
 

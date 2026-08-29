@@ -1,6 +1,7 @@
 // src/pages/admin/Images.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ScrollToTopButton from './ScrollToTopButton';
 
 export default function Images({ onNavigate }) {
   const [mediaList, setMediaList] = useState([]);
@@ -34,7 +35,7 @@ export default function Images({ onNavigate }) {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto text-white">
+    <div className="p-6 max-w-7xl mx-auto text-white relative min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">IMAGE LIBRARY</h1>
         <div className="flex gap-3">
@@ -85,6 +86,9 @@ export default function Images({ onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* Floating Go to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
-} 
+}

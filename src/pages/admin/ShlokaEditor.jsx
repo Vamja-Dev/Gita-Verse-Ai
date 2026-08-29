@@ -1,6 +1,7 @@
 // src/pages/admin/ShlokaEditor.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ScrollToTopButton from './ScrollToTopButton';
 
 export default function ShlokaEditor({ shlokaId, onNavigate }) {
   const [shloka, setShloka] = useState(null);
@@ -38,7 +39,7 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
   if (!shloka) return <div className="p-6 text-red-500">Shloka not found.</div>;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto text-white">
+    <div className="p-6 max-w-5xl mx-auto text-white relative min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Edit Shloka {shloka.chapter_number}.{shloka.shloka_number}</h1>
         <div className="flex gap-2">
@@ -158,6 +159,9 @@ export default function ShlokaEditor({ shlokaId, onNavigate }) {
           </button>
         </div>
       </div>
+
+      {/* Floating Go to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
 }

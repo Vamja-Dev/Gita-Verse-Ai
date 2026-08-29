@@ -1,17 +1,24 @@
 // src/pages/admin/AdminLogin.jsx
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (email.toLowerCase() === 'admin@gitaverse.com' && password === 'admin123') {
+    try {
+      // Calls backend endpoint to print "Admin login success" in Terminal 1
+      await axios.post('http://localhost:8000/api/admin/login', {
+        email,
+        password
+      });
+
       sessionStorage.setItem('gita_admin_auth', 'true');
       window.location.href = '/admin';
-    } else {
+    } catch (err) {
       alert('Invalid admin credentials.');
     }
   };

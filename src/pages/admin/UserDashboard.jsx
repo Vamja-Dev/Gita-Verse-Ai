@@ -1,6 +1,7 @@
 // src/pages/admin/UserDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ScrollToTopButton from './ScrollToTopButton';
 
 export default function UserDashboard({ onNavigate }) {
   const [logs, setLogs] = useState([]);
@@ -34,7 +35,7 @@ export default function UserDashboard({ onNavigate }) {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto text-white">
+    <div className="p-6 max-w-7xl mx-auto text-white relative min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">USER ACTIVITY & AUTH LOGS</h1>
         <button 
@@ -100,6 +101,9 @@ export default function UserDashboard({ onNavigate }) {
           </div>
         </div>
       )}
+
+      {/* Floating Go to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 # backend/main.py
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+from pydantic import BaseModel
 import os
 import threading
 import time
@@ -35,8 +36,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"❌ [CRITICAL DB ERROR]: {e}")
         raise e
-
-    # Startup sync call removed to prevent duplicate 429 rate-limit errors with SheetDB
     
     sync_thread = threading.Thread(target=background_sheet_sync_worker, daemon=True)
     sync_thread.start()
@@ -63,6 +62,18 @@ app.include_router(shlokas_router, prefix="/api")
 app.include_router(chapters_router, prefix="/api")
 app.include_router(auth_logger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+
+# Admin Login Authentication Endpoint
+class AdminLoginRequest(BaseModel):
+    email: str
+    password: str
+
+@app.post("/api/admin/login")
+def admin_login(creds: AdminLoginRequest):
+    if creds.email.lower() == "admin@gitaverse.com" and creds.password == "admin123":
+        print("Admin login success: Administrator authenticated successfully.")
+        return {"status": "success", "message": "Admin authenticated"}
+    raise HTTPException(status_code=401, detail="Invalid admin credentials")
 
 @app.get("/api/health")
 def health_check():
