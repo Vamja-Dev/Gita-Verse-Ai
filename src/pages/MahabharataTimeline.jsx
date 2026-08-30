@@ -1,15 +1,42 @@
-import React, { useState } from 'react';
+// src/pages/MahabharataTimeline.jsx
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Compass, X, Eye } from 'lucide-react';
+import axios from 'axios';
 
 // Import timeline background asset directly
 import timelineBg from '../assets/images/timeline-bg.png';
 
-// Data is imported from the external file as requested
-import { eras } from '../data/timelineData';
+// Data is imported from the external file as fallback
+import { eras as staticEras } from '../data/timelineData';
 
 export default function MahabharataTimeline({ onNavigate }) {
+  const [eras, setEras] = useState(staticEras);
   const [selectedEra, setSelectedEra] = useState(null);
+
+  useEffect(() => {
+    // Attempt to fetch live database content with dual-mode fallback, mapping fields to static images
+    axios.get('http://localhost:8000/api/admin/cms/timeline')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          const merged = liveData.map((item, index) => ({
+            ...item,
+            image: staticEras[index]?.image || item.image || item.image_url,
+            title: item.title || item.name || staticEras[index]?.title,
+            name: item.name || item.title || staticEras[index]?.name,
+            subtitle: item.subtitle || item.theme || staticEras[index]?.subtitle,
+            description: item.description || item.summary || staticEras[index]?.description,
+            keyPoints: item.keyPoints || item.highlights || staticEras[index]?.keyPoints,
+            fullDetails: item.fullDetails || item.detailedInfo || staticEras[index]?.fullDetails
+          }));
+          setEras(merged);
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline. Falling back to static timelineData.");
+      });
+  }, []);
 
   return (
     <main className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-[#06040a] pb-24">
@@ -46,7 +73,7 @@ export default function MahabharataTimeline({ onNavigate }) {
 
             return (
               <motion.div 
-                key={era.id}
+                key={era._id || era.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -62,7 +89,7 @@ export default function MahabharataTimeline({ onNavigate }) {
                 >
                   <img 
                     src={era.image} 
-                    alt={era.title}
+                    alt={era.title || era.name}
                     className="w-full h-auto block group-hover:scale-105 transition-transform duration-700 z-0" 
                   />
 
@@ -78,7 +105,7 @@ export default function MahabharataTimeline({ onNavigate }) {
 
                   {/* Title fixed at bottom left of image - Small font size */}
                   <div className="absolute bottom-6 left-8 z-30 space-y-2">
-                    <h3 className="text-xl md:text-2xl font-serif text-amber-50 drop-shadow-lg">{era.title}</h3>
+                    <h3 className="text-xl md:text-2xl font-serif text-amber-50 drop-shadow-lg">{era.title || era.name}</h3>
                   </div>
                 </div>
 
@@ -91,15 +118,15 @@ export default function MahabharataTimeline({ onNavigate }) {
                       </span>
                       <span className="text-xs font-sans text-amber-300/70">•</span>
                       <span className="text-[10px] font-sans text-amber-300/80 uppercase tracking-widest font-medium">
-                        {era.subtitle}
+                        {era.subtitle || era.theme}
                       </span>
                     </div>
                     <h2 className="text-3xl md:text-4xl font-serif text-amber-100 tracking-wide flex flex-wrap items-baseline gap-3">
-                      <span>{era.title}</span>
-                      <span className="text-xl text-amber-400/80 font-light font-sans">({era.sanskritName})</span>
+                      <span>{era.title || era.name}</span>
+                      {era.sanskritName && <span className="text-xl text-amber-400/80 font-light font-sans">({era.sanskritName})</span>}
                     </h2>
                     <p className="text-sm md:text-base font-sans text-slate-300/90 leading-relaxed font-light">
-                      {era.description}
+                      {era.description || era.summary}
                     </p>
                   </div>
 
@@ -109,7 +136,7 @@ export default function MahabharataTimeline({ onNavigate }) {
                       <Sparkles className="w-4 h-4 text-amber-400" /> Milestone Highlights
                     </h4>
                     <ul className="space-y-2.5">
-                      {era.keyPoints.map((point, i) => (
+                      {era.keyPoints?.map((point, i) => (
                         <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-slate-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 shrink-0 shadow-[0_0_8px_#fbbf24]" />
                           <span>{point}</span>
@@ -159,19 +186,19 @@ export default function MahabharataTimeline({ onNavigate }) {
 
               <div className="space-y-2 border-b border-amber-500/20 pb-6">
                 <span className="text-xs font-sans text-amber-400 uppercase tracking-widest font-bold">
-                  {selectedEra.subtitle} • {selectedEra.sanskritName}
+                  {selectedEra.subtitle || selectedEra.theme} • {selectedEra.sanskritName}
                 </span>
-                <h2 className="text-3xl md:text-5xl font-serif text-amber-100">{selectedEra.title}</h2>
+                <h2 className="text-3xl md:text-5xl font-serif text-amber-100">{selectedEra.title || selectedEra.name}</h2>
               </div>
 
               {/* Modal Image Area */}
               <div className="relative w-full rounded-2xl overflow-hidden border border-amber-500/30 shadow-2xl bg-black">
-                <img src={selectedEra.image} alt={selectedEra.title} className="w-full h-auto block" />
+                <img src={selectedEra.image} alt={selectedEra.title || selectedEra.name} className="w-full h-auto block" />
               </div>
 
               {/* Abundant Content Paragraphs */}
               <div className="space-y-6 font-sans text-slate-300 text-base md:text-lg leading-relaxed font-light">
-                {selectedEra.fullDetails.map((paragraph, index) => (
+                {selectedEra.fullDetails?.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
 
@@ -181,7 +208,7 @@ export default function MahabharataTimeline({ onNavigate }) {
                     <Sparkles className="w-5 h-5 text-amber-400" /> Key Historical & Scriptural Pillars
                   </h4>
                   <ul className="space-y-3">
-                    {selectedEra.keyPoints.map((pt, idx) => (
+                    {selectedEra.keyPoints?.map((pt, idx) => (
                       <li key={idx} className="flex items-start gap-3 text-sm md:text-base text-slate-200">
                         <span className="text-amber-400 mt-1">✦</span> 
                         <span>{pt}</span>

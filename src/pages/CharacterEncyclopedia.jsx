@@ -1,18 +1,42 @@
-import React, { useState } from 'react';
+// src/pages/CharacterEncyclopedia.jsx
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, User, X, Eye, BookOpen } from 'lucide-react';
-import { charactersData } from '../data/charactersData';
+import axios from 'axios';
+import { charactersData as staticCharactersData } from '../data/charactersData';
 import characterBg from '../assets/images/character-bg.png';
 
 export default function CharacterEncyclopedia({ onNavigate }) {
+  const [characters, setCharacters] = useState(staticCharactersData);
   const [selectedChar, setSelectedChar] = useState(null);
   const [filterFaction, setFilterFaction] = useState('ALL');
 
-  const characters = charactersData;
+  useEffect(() => {
+    // Attempt to fetch live database characters with dual-mode fallback, mapping fields to static images
+    axios.get('http://localhost:8000/api/admin/cms/characters')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          const merged = liveData.map((item, index) => ({
+            ...item,
+            image: staticCharactersData[index]?.image || item.image || item.image_url,
+            name: item.name || item.title || staticCharactersData[index]?.name,
+            faction: (item.faction || staticCharactersData[index]?.faction || 'DIVINE').toUpperCase(),
+            description: item.description || item.summary || staticCharactersData[index]?.description,
+            highlights: item.highlights || item.keyPoints || staticCharactersData[index]?.highlights,
+            fullDetails: item.fullDetails || staticCharactersData[index]?.fullDetails
+          }));
+          setCharacters(merged);
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline. Falling back to static charactersData.");
+      });
+  }, []);
 
   const filteredCharacters = filterFaction === 'ALL'
     ? characters
-    : characters.filter(c => c.faction.toUpperCase().includes(filterFaction));
+    : characters.filter(c => (c.faction || '').toUpperCase().includes(filterFaction));
 
   return (
     <main className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-[#07050d] pb-24 selection:bg-amber-500 selection:text-slate-950">
@@ -74,7 +98,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
 
             return (
               <motion.div
-                key={char.id}
+                key={char._id || char.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -90,7 +114,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#07050d] via-transparent to-transparent opacity-80 z-10" />
                   <img
                     src={char.image}
-                    alt={char.name}
+                    alt={char.name || char.title}
                     className="w-full h-[380px] md:h-[450px] object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   
@@ -104,7 +128,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                     <span className="text-xs font-sans text-amber-400 uppercase tracking-widest bg-amber-500/15 backdrop-blur-md px-3.5 py-1 rounded-full border border-amber-500/30">
                       {char.faction}
                     </span>
-                    <h3 className="text-3xl font-serif text-amber-100 pt-2">{char.name}</h3>
+                    <h3 className="text-3xl font-serif text-amber-100 pt-2">{char.name || char.title}</h3>
                   </div>
                 </div>
 
@@ -115,7 +139,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                     </span>
                     
                     <h2 className="text-3xl md:text-4xl font-serif text-amber-100 tracking-wide flex items-center gap-3 flex-wrap">
-                      <span>{char.name}</span>
+                      <span>{char.name || char.title}</span>
                       {char.sanskritName && (
                         <span className="text-amber-400/80 font-normal text-2xl md:text-3xl">
                           ({char.sanskritName})
@@ -124,7 +148,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                     </h2>
 
                     <p className="text-sm md:text-base font-sans text-slate-300/80 leading-relaxed font-light">
-                      {char.description}
+                      {char.description || char.summary}
                     </p>
                   </div>
 
@@ -186,7 +210,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
                   {selectedChar.faction}
                 </span>
                 <h2 className="text-3xl md:text-5xl font-serif text-amber-100 pt-2 flex items-baseline gap-3 flex-wrap">
-                  <span>{selectedChar.name}</span>
+                  <span>{selectedChar.name || selectedChar.title}</span>
                   {selectedChar.sanskritName && (
                     <span className="text-amber-400 font-normal text-2xl md:text-3xl">
                       ({selectedChar.sanskritName})
@@ -202,7 +226,7 @@ export default function CharacterEncyclopedia({ onNavigate }) {
               >
                 <img 
                   src={selectedChar.image} 
-                  alt={selectedChar.name} 
+                  alt={selectedChar.name || selectedChar.title} 
                   className="w-full h-full object-cover" 
                 />
               </div>
