@@ -6,7 +6,7 @@ from database.connection import get_db
 from bson import ObjectId
 
 router = APIRouter(prefix="/admin/cms", tags=["CMS Content Management"])
-VALID_SECTIONS = ["vedas", "yugas", "timeline", "characters", "map"]
+VALID_SECTIONS = ["vedas", "yugas", "timeline", "characters", "map", "home"]
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "admin-txt")
 os.makedirs(LOG_DIR, exist_ok=True)

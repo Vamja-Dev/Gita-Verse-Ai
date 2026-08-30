@@ -1,16 +1,46 @@
 // src/pages/Home.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
+import axios from 'axios';
 import CursorRevealSection from '../components/home/CursorRevealSection';
 import DailyWisdomCard from '../components/home/DailyWisdomCard';
 import ScrollStory from '../components/story/ScrollStory';
 import IntroLoader from '../components/story/IntroLoader';
 
+// Fallback core images
+import artwork1 from '../assets/images/artwork-1.jpg';
+import artwork2 from '../assets/images/artwork-2.jpg';
+import artwork3 from '../assets/images/artwork-3.jpg';
+
 export default function Home({ onNavigate }) {
   const [loading, setLoading] = useState(() => {
     return !sessionStorage.getItem('hasSeenIntro');
   });
+
+  // Keep track of the dynamically selected unique random images for your 3 sections on refresh
+  const [randomizedImages, setRandomizedImages] = useState([artwork1, artwork2, artwork3]);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/admin/cms/home')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          // For each home section pool, randomly pick one unique image on every refresh
+          const selectedImages = liveData.map(sec => {
+            const pool = sec.images && sec.images.length > 0 ? sec.images : [artwork1, artwork2, artwork3];
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            return pool[randomIndex];
+          });
+          if (selectedImages.length >= 3) {
+            setRandomizedImages([selectedImages[0], selectedImages[1], selectedImages[2]]);
+          }
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline for home images, using default core art.");
+      });
+  }, []);
 
   const handleLoaderComplete = () => {
     sessionStorage.setItem('hasSeenIntro', 'true');
@@ -49,7 +79,8 @@ export default function Home({ onNavigate }) {
         <DailyWisdomCard />
       </section>
 
-      <ScrollStory />
+      {/* Passing the dynamically rotated random images down to ScrollStory */}
+      <ScrollStory customImages={randomizedImages} />
 
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/60 backdrop-blur-md border-t border-amber-500/10">
         © 2026 GitaVerse AI. All rights reserved.

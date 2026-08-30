@@ -6,6 +6,7 @@ export default function AdminDashboard({ onNavigate }) {
   const [activeTab, setActiveTab] = useState(null);
 
   const menuItems = [
+    { title: 'Home Sections', path: 'admin/home' },
     { title: 'Chapters', path: 'admin/chapters' },
     { title: 'Shlokas', path: 'admin/shlokas' },
     { title: 'Vedas', path: 'admin/vedas' },
@@ -42,7 +43,9 @@ export default function AdminDashboard({ onNavigate }) {
               activeTab === item.path ? 'border-amber-500 bg-gray-800/80' : 'border-gray-800 hover:border-amber-500/50'
             }`}
           >
-            <h2 className="text-xl font-bold text-amber-400">{item.title}</h2>
+            <h2 className="text-xl font-bold text-amber-400">
+              {index + 1} = {item.title}
+            </h2>
             <span className="text-gray-500 text-xl">→</span>
           </div>
         ))}

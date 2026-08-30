@@ -1,6 +1,8 @@
-import React from 'react';
+// src/pages/KurukshetraMap.jsx
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Compass, Sparkles } from 'lucide-react';
+import axios from 'axios';
 
 // Import map images directly
 import mainMapImg from '../assets/images/main-map.png';
@@ -9,7 +11,69 @@ import kuru48KosImg from '../assets/images/kuru-48kros.png';
 import kuruJyotisarImg from '../assets/images/kuru-jyotisar.png';
 import bgMapImg from '../assets/images/bg-map.png';
 
+const staticMapData = [
+  {
+    id: 1,
+    title: "The Sacred Geography of Kurukshetra",
+    subtitle: "Historical Storytelling • Kurukshetra Map",
+    description: "Explore the complete sacred geography of Kurukshetra through its ancient sites, pilgrimage routes and historical landmarks.",
+    image: mainMapImg
+  },
+  {
+    id: 2,
+    title: "Kurukshetra — The Sacred Land",
+    subtitle: "HISTORICAL REGION",
+    description: "This inset map represents the geography of the major kingdoms involved in the events leading up to the Mahabharata War, including Kuru, Panchal, Matsya, and neighbouring regions. It reflects the political landscape of the time, where diplomacy and alliances shaped the course of history. The map also references Viratnagar in the Matsya kingdom, associated with the crucial discussions between Yudhishthira and Sri Krishna, including the proposal of five villages to the Pandavas in a final effort to avert the great war.",
+    highlights: ['Ancient Kuru region', 'Kurukshetra', 'Hastinapur', 'Indraprastha', 'Mathura'],
+    image: kuruMapImg
+  },
+  {
+    id: 3,
+    title: "48 Kos Kurukshetra Parikrama",
+    subtitle: "PILGRIMAGE JOURNEY",
+    description: "The 48 Kos Kurukshetra region represents the sacred pilgrimage landscape surrounding Kurukshetra. The map traces the Parikrama Marg and identifies numerous pilgrimage sites, sacred ponds, villages and historical locations along the route.",
+    highlights: ['48 Kos Kurukshetra', 'Parikrama Marg', 'Pilgrimage sites', 'Sacred ponds', 'Historical locations'],
+    image: kuru48KosImg
+  },
+  {
+    id: 4,
+    title: "Jyotisar — The Battlefield of Dharma",
+    subtitle: "BHAGAVAD GITA • JYOTISAR",
+    description: "Jyotisar is the sacred land where Sri Krishna delivered the message of the Bhagavad Gita to Arjuna before the battle of the Mahabharata, and is one of the many significant sites depicted on this map of Kurukshetra.",
+    highlights: ['Jyotisar', 'Bhagavad Gita', 'Krishna and Arjuna', 'Battle of Dharma', 'Kurukshetra'],
+    image: kuruJyotisarImg
+  }
+];
+
 export default function KurukshetraMap({ onNavigate }) {
+  const [mapSections, setMapSections] = useState(staticMapData);
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/admin/cms/map')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          const merged = liveData.map((item, index) => ({
+            ...item,
+            image: staticMapData[index]?.image || item.image,
+            title: item.title || item.name || staticMapData[index]?.title,
+            subtitle: item.subtitle || item.theme || staticMapData[index]?.subtitle,
+            description: item.description || item.summary || staticMapData[index]?.description,
+            highlights: item.highlights || item.keyPoints || staticMapData[index]?.highlights
+          }));
+          setMapSections(merged);
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline. Falling back to static map view.");
+      });
+  }, []);
+
+  const topSection = mapSections[0] || staticMapData[0];
+  const section1 = mapSections[1] || staticMapData[1];
+  const section2 = mapSections[2] || staticMapData[2];
+  const section3 = mapSections[3] || staticMapData[3];
+
   return (
     <main className="relative w-full min-h-screen text-[#2d1806] font-serif overflow-x-hidden bg-[#e8d5b5]">
       {/* Background Image Layer using bg-map.png */}
@@ -35,13 +99,13 @@ export default function KurukshetraMap({ onNavigate }) {
           <div className="space-y-3 max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#3e2714]/15 border border-[#3e2714]/40 text-[#3e2714] text-xs font-sans tracking-widest uppercase font-semibold shadow-sm">
               <Compass className="w-4 h-4 text-[#3e2714]" />
-              <span>Historical Storytelling • Kurukshetra Map</span>
+              <span>{topSection.subtitle}</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-serif text-[#231204] font-bold tracking-wide">
-              The Sacred Geography of Kurukshetra
+              {topSection.title}
             </h1>
             <p className="text-xs md:text-sm font-sans text-[#4a2e12] font-medium max-w-xl mx-auto leading-relaxed">
-              Explore the complete sacred geography of Kurukshetra through its ancient sites, pilgrimage routes and historical landmarks.
+              {topSection.description}
             </p>
           </div>
 
@@ -77,29 +141,31 @@ export default function KurukshetraMap({ onNavigate }) {
             <div className="w-full lg:w-[46%] space-y-6">
               <div className="space-y-3">
                 <span className="text-xs font-sans text-[#5c3a21] uppercase tracking-[0.25em] font-bold">
-                  HISTORICAL REGION
+                  {section1.subtitle}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-serif text-[#231204] font-bold tracking-wide">
-                  Kurukshetra — The Sacred Land
+                  {section1.title}
                 </h2>
                 <p className="text-sm md:text-base font-sans text-[#38200d] leading-relaxed font-normal">
-                  This inset map represents the geography of the major kingdoms involved in the events leading up to the Mahabharata War, including Kuru, Panchal, Matsya, and neighbouring regions. It reflects the political landscape of the time, where diplomacy and alliances shaped the course of history. The map also references Viratnagar in the Matsya kingdom, associated with the crucial discussions between Yudhishthira and Sri Krishna, including the proposal of five villages to the Pandavas in a final effort to avert the great war.
+                  {section1.description}
                 </p>
               </div>
 
-              <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
-                <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
-                </h4>
-                <ul className="space-y-2.5">
-                  {['Ancient Kuru region', 'Kurukshetra', 'Hastinapur', 'Indraprastha', 'Mathura'].map((point, i) => (
-                    <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {section1.highlights && (
+                <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
+                  <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {section1.highlights.map((point, i) => (
+                      <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -120,29 +186,31 @@ export default function KurukshetraMap({ onNavigate }) {
             <div className="w-full lg:w-[46%] space-y-6">
               <div className="space-y-3">
                 <span className="text-xs font-sans text-[#5c3a21] uppercase tracking-[0.25em] font-bold">
-                  PILGRIMAGE JOURNEY
+                  {section2.subtitle}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-serif text-[#231204] font-bold tracking-wide">
-                  48 Kos Kurukshetra Parikrama
+                  {section2.title}
                 </h2>
                 <p className="text-sm md:text-base font-sans text-[#38200d] leading-relaxed font-normal">
-                  The 48 Kos Kurukshetra region represents the sacred pilgrimage landscape surrounding Kurukshetra. The map traces the Parikrama Marg and identifies numerous pilgrimage sites, sacred ponds, villages and historical locations along the route.
+                  {section2.description}
                 </p>
               </div>
 
-              <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
-                <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
-                </h4>
-                <ul className="space-y-2.5">
-                  {['48 Kos Kurukshetra', 'Parikrama Marg', 'Pilgrimage sites', 'Sacred ponds', 'Historical locations'].map((point, i) => (
-                    <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {section2.highlights && (
+                <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
+                  <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {section2.highlights.map((point, i) => (
+                      <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -163,29 +231,31 @@ export default function KurukshetraMap({ onNavigate }) {
             <div className="w-full lg:w-[46%] space-y-6">
               <div className="space-y-3">
                 <span className="text-xs font-sans text-[#5c3a21] uppercase tracking-[0.25em] font-bold">
-                  BHAGAVAD GITA • JYOTISAR
+                  {section3.subtitle}
                 </span>
                 <h2 className="text-3xl md:text-4xl font-serif text-[#231204] font-bold tracking-wide">
-                  Jyotisar — The Battlefield of Dharma
+                  {section3.title}
                 </h2>
                 <p className="text-sm md:text-base font-sans text-[#38200d] leading-relaxed font-normal">
-                  Jyotisar is the sacred land where Sri Krishna delivered the message of the Bhagavad Gita to Arjuna before the battle of the Mahabharata, and is one of the many significant sites depicted on this map of Kurukshetra.
+                  {section3.description}
                 </p>
               </div>
 
-              <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
-                <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
-                </h4>
-                <ul className="space-y-2.5">
-                  {['Jyotisar', 'Bhagavad Gita', 'Krishna and Arjuna', 'Battle of Dharma', 'Kurukshetra'].map((point, i) => (
-                    <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {section3.highlights && (
+                <div className="space-y-3 bg-[#f4ebd0]/95 backdrop-blur-xl border border-[#5c3a21]/30 rounded-2xl p-6 shadow-md">
+                  <h4 className="text-xs font-sans uppercase tracking-widest text-[#4a2e12] font-bold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#5c3a21]" /> Key Region Highlights
+                  </h4>
+                  <ul className="space-y-2.5">
+                    {section3.highlights.map((point, i) => (
+                      <li key={i} className="flex items-start gap-3 text-xs md:text-sm font-sans text-[#231204] font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#5c3a21] mt-2 shrink-0 shadow-sm" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </motion.div>
 
