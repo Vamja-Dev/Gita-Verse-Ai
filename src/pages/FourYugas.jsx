@@ -1,11 +1,36 @@
-import React, { useState } from 'react';
+// src/pages/FourYugas.jsx
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Scroll, X, Eye } from 'lucide-react';
-import { yugasData } from '../data/yugasData';
+import axios from 'axios';
+import { yugasData as staticYugasData } from '../data/yugasData';
 import vedaBg from '../assets/images/veda-bg.png';
 
 export default function FourYugas({ onNavigate }) {
+  const [yugas, setYugas] = useState(staticYugasData);
   const [selectedYuga, setSelectedYuga] = useState(null);
+
+  useEffect(() => {
+    // Attempt to fetch live database content with dual-mode fallback, mapping fields to static images
+    axios.get('http://localhost:8000/api/admin/cms/yugas')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          const merged = liveData.map((item, index) => ({
+            ...item,
+            image: staticYugasData[index]?.image || item.image || item.image_url,
+            name: item.name || item.title || staticYugasData[index]?.name,
+            summary: item.summary || item.description || staticYugasData[index]?.summary,
+            highlights: item.highlights || item.keyPoints || staticYugasData[index]?.highlights,
+            detailedInfo: item.detailedInfo || item.fullDetails || staticYugasData[index]?.detailedInfo
+          }));
+          setYugas(merged);
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline. Falling back to static yugasData.");
+      });
+  }, []);
 
   return (
     <main className="relative w-full min-h-screen text-slate-100 font-serif px-6 md:px-16 pt-36 pb-24 overflow-x-hidden flex flex-col items-center bg-[#06040a]">
@@ -38,12 +63,12 @@ export default function FourYugas({ onNavigate }) {
 
         {/* Alternating Yuga Rows */}
         <div className="space-y-24">
-          {yugasData.map((yuga, index) => {
+          {yugas.map((yuga, index) => {
             const isEven = index % 2 === 0;
 
             return (
               <motion.div 
-                key={yuga.id}
+                key={yuga._id || yuga.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -60,7 +85,7 @@ export default function FourYugas({ onNavigate }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#06040a] via-transparent to-transparent opacity-80 z-10" />
                   <img 
                     src={yuga.image} 
-                    alt={yuga.name}
+                    alt={yuga.name || yuga.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                   />
                   
@@ -74,7 +99,7 @@ export default function FourYugas({ onNavigate }) {
                   {/* Only Name inside bottom-left of image card */}
                   <div className="absolute bottom-6 left-6 z-20 space-y-1">
                     <h3 className="text-3xl font-serif text-amber-100">
-                      {yuga.name}
+                      {yuga.name || yuga.title}
                     </h3>
                   </div>
                 </div>
@@ -86,11 +111,11 @@ export default function FourYugas({ onNavigate }) {
                       YUGA 0{index + 1} • {yuga.theme}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-serif text-amber-100 tracking-wide flex items-baseline gap-3">
-                      <span>{yuga.name}</span>
+                      <span>{yuga.name || yuga.title}</span>
                       <span className="text-2xl text-amber-400/90 font-normal font-serif">({yuga.sanskritName})</span>
                     </h2>
                     <p className="text-sm md:text-base font-sans text-slate-200/90 leading-relaxed font-light">
-                      {yuga.summary}
+                      {yuga.summary || yuga.description}
                     </p>
                   </div>
 
@@ -153,13 +178,13 @@ export default function FourYugas({ onNavigate }) {
                   {selectedYuga.theme}
                 </span>
                 <h2 className="text-3xl md:text-5xl font-serif text-amber-100 flex items-baseline gap-3 flex-wrap">
-                  <span>{selectedYuga.name}</span>
+                  <span>{selectedYuga.name || selectedYuga.title}</span>
                   <span className="text-2xl md:text-3xl text-amber-400 font-normal">({selectedYuga.sanskritName})</span>
                 </h2>
               </div>
 
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-amber-500/30 shadow-2xl">
-                <img src={selectedYuga.image} alt={selectedYuga.name} className="w-full h-full object-cover" />
+                <img src={selectedYuga.image} alt={selectedYuga.name || selectedYuga.title} className="w-full h-full object-cover" />
               </div>
 
               {/* Abundant Content Paragraphs inside Modal */}

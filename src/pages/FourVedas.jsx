@@ -1,11 +1,36 @@
-import React, { useState } from 'react';
+// src/pages/FourVedas.jsx
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Scroll, X, Eye } from 'lucide-react';
-import { vedasData } from '../data/vedasData';
+import axios from 'axios';
+import { vedasData as staticVedasData } from '../data/vedasData';
 import vedaBg from '../assets/images/veda-bg.png';
 
 export default function FourVedas({ onNavigate }) {
+  const [vedas, setVedas] = useState(staticVedasData);
   const [selectedVeda, setSelectedVeda] = useState(null);
+
+  useEffect(() => {
+    // Fetch text edits from DB, but map them to the local static images so they never break
+    axios.get('http://localhost:8000/api/admin/cms/vedas')
+      .then(res => {
+        const liveData = res.data.data || [];
+        if (liveData.length > 0) {
+          // Merge database text contents with local static images to guarantee they show up
+          const merged = liveData.map((item, index) => ({
+            ...item,
+            image: staticVedasData[index]?.image || item.image || item.image_url,
+            name: item.name || item.title || staticVedasData[index]?.name,
+            summary: item.summary || item.description || staticVedasData[index]?.summary,
+            fullDetails: item.fullDetails || staticVedasData[index]?.fullDetails
+          }));
+          setVedas(merged);
+        }
+      })
+      .catch(err => {
+        console.warn("Backend offline. Using local static vedasData with images.");
+      });
+  }, []);
 
   return (
     <main className="relative w-full min-h-screen text-slate-100 font-serif px-6 md:px-16 pt-36 pb-24 overflow-x-hidden flex flex-col items-center bg-[#06040a]">
@@ -38,12 +63,12 @@ export default function FourVedas({ onNavigate }) {
 
         {/* Alternating Veda Rows */}
         <div className="space-y-24">
-          {vedasData.map((veda, index) => {
+          {vedas.map((veda, index) => {
             const isEven = index % 2 === 0;
 
             return (
               <motion.div 
-                key={veda.id}
+                key={veda._id || veda.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
@@ -52,7 +77,7 @@ export default function FourVedas({ onNavigate }) {
                   isEven ? '' : 'lg:flex-row-reverse'
                 }`}
               >
-                {/* Image Box with Only Name Inside Overlay */}
+                {/* Image Box */}
                 <div 
                   onClick={() => setSelectedVeda(veda)}
                   className="relative group w-full lg:w-1/2 aspect-video rounded-3xl overflow-hidden border border-amber-500/30 bg-[#0d0914] shadow-[0_20px_50px_rgba(0,0,0,0.8)] cursor-pointer"
@@ -60,7 +85,7 @@ export default function FourVedas({ onNavigate }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#06040a] via-transparent to-transparent opacity-80 z-10" />
                   <img 
                     src={veda.image} 
-                    alt={veda.name}
+                    alt={veda.name || veda.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                   />
                   
@@ -71,10 +96,10 @@ export default function FourVedas({ onNavigate }) {
                     </span>
                   </div>
 
-                  {/* Only Name inside bottom-left of image card */}
+                  {/* Name inside bottom-left of image card */}
                   <div className="absolute bottom-6 left-6 z-20 space-y-1">
                     <h3 className="text-3xl font-serif text-amber-100">
-                      {veda.name}
+                      {veda.name || veda.title}
                     </h3>
                   </div>
                 </div>
@@ -86,15 +111,15 @@ export default function FourVedas({ onNavigate }) {
                       VEDA 0{index + 1} • {veda.theme}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-serif text-amber-100 tracking-wide flex items-baseline gap-3">
-                      <span>{veda.name}</span>
+                      <span>{veda.name || veda.title}</span>
                       <span className="text-2xl text-amber-400/90 font-normal font-serif">({veda.sanskritName})</span>
                     </h2>
                     <p className="text-sm md:text-base font-sans text-slate-200/90 leading-relaxed font-light">
-                      {veda.summary}
+                      {veda.summary || veda.description}
                     </p>
                   </div>
 
-                  {/* Highlighted Bullet Points for Main Card */}
+                  {/* Highlighted Bullet Points */}
                   <div className="space-y-3 bg-[#0d0914]/75 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-6 shadow-xl">
                     <h4 className="text-xs font-sans uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-amber-400" /> Sacred Highlights
@@ -123,7 +148,7 @@ export default function FourVedas({ onNavigate }) {
 
       </div>
 
-      {/* Interactive Detail Modal with Abundant Information & Highlighted Points */}
+      {/* Interactive Detail Modal */}
       <AnimatePresence>
         {selectedVeda && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
@@ -153,22 +178,20 @@ export default function FourVedas({ onNavigate }) {
                   {selectedVeda.theme}
                 </span>
                 <h2 className="text-3xl md:text-5xl font-serif text-amber-100 flex items-baseline gap-3 flex-wrap">
-                  <span>{selectedVeda.name}</span>
+                  <span>{selectedVeda.name || selectedVeda.title}</span>
                   <span className="text-2xl md:text-3xl text-amber-400 font-normal">({selectedVeda.sanskritName})</span>
                 </h2>
               </div>
 
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-amber-500/30 shadow-2xl">
-                <img src={selectedVeda.image} alt={selectedVeda.name} className="w-full h-full object-cover" />
+                <img src={selectedVeda.image} alt={selectedVeda.name || selectedVeda.title} className="w-full h-full object-cover" />
               </div>
 
-              {/* Abundant Content Paragraphs inside Modal */}
               <div className="space-y-6 font-sans text-slate-300 text-base md:text-lg leading-relaxed font-light">
                 {selectedVeda.fullDetails?.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
 
-                {/* Highlighted Key Points Included Inside Modal */}
                 <div className="bg-slate-950/60 border border-amber-500/20 rounded-2xl p-6 md:p-8 space-y-4 shadow-xl my-6">
                   <h4 className="text-xs md:text-sm uppercase tracking-widest text-amber-400 font-bold flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-amber-400" /> Key Sacred Milestones & Highlights
@@ -183,7 +206,6 @@ export default function FourVedas({ onNavigate }) {
                   </ul>
                 </div>
 
-                {/* Spiritual Significance Box */}
                 <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 md:p-8 space-y-4 my-6 shadow-xl">
                   <h4 className="text-xs md:text-sm uppercase tracking-widest text-amber-300 font-bold flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-amber-400" /> Deep Spiritual Significance

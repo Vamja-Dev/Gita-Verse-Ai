@@ -27,6 +27,11 @@ import ShlokaEditor from './pages/admin/ShlokaEditor';
 import Images from './pages/admin/Images';
 import ImageUploader from './pages/admin/ImageUploader';
 import UserDashboardAdmin from './pages/admin/UserDashboard';
+import CmsManager from './pages/admin/CmsManager';
+import VedasAdmin from './pages/admin/VedasAdmin';
+import VedaEditor from './pages/admin/VedaEditor';
+import YugasAdmin from './pages/admin/YugasAdmin';
+import YugaEditor from './pages/admin/YugaEditor';
 
 // Import all 18 chapter images
 import chp1 from './assets/images/ch-1.jpg';
@@ -59,6 +64,8 @@ export default function App() {
   const [selectedChapterNum, setSelectedChapterNum] = useState(1);
   const [selectedShlokaNum, setSelectedShlokaNum] = useState(null);
   const [selectedShlokaId, setSelectedShlokaId] = useState(null);
+  const [selectedVedaId, setSelectedVedaId] = useState(null);
+  const [selectedYugaId, setSelectedYugaId] = useState(null);
 
   // Track admin authentication status securely in session/state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
@@ -82,6 +89,14 @@ export default function App() {
         const parts = path.split('/');
         setSelectedShlokaId(parts[2]);
         setCurrentPage('admin/shloka-edit');
+      } else if (path.startsWith('/admin/vedas/') && path.endsWith('/edit')) {
+        const parts = path.split('/');
+        setSelectedVedaId(parts[2]);
+        setCurrentPage('admin/veda-edit');
+      } else if (path.startsWith('/admin/yugas/') && path.endsWith('/edit')) {
+        const parts = path.split('/');
+        setSelectedYugaId(parts[2]);
+        setCurrentPage('admin/yuga-edit');
       } else {
         setCurrentPage(path.substring(1));
       }
@@ -134,6 +149,24 @@ export default function App() {
       const parts = pageOrAction.split('/');
       setSelectedShlokaId(parts[2]);
       setCurrentPage('admin/shloka-edit');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.history.pushState({}, '', `/${pageOrAction}`);
+      return;
+    }
+
+    if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/vedas/') && pageOrAction.endsWith('/edit')) {
+      const parts = pageOrAction.split('/');
+      setSelectedVedaId(parts[2]);
+      setCurrentPage('admin/veda-edit');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.history.pushState({}, '', `/${pageOrAction}`);
+      return;
+    }
+
+    if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/yugas/') && pageOrAction.endsWith('/edit')) {
+      const parts = pageOrAction.split('/');
+      setSelectedYugaId(parts[2]);
+      setCurrentPage('admin/yuga-edit');
       window.scrollTo({ top: 0, behavior: 'instant' });
       window.history.pushState({}, '', `/${pageOrAction}`);
       return;
@@ -218,6 +251,34 @@ export default function App() {
 
         {currentPage === 'admin/image-uploader' && isAdminAuthenticated && (
           <ImageUploader onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/vedas' && isAdminAuthenticated && (
+          <VedasAdmin onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/veda-edit' && isAdminAuthenticated && (
+          <VedaEditor vedaId={selectedVedaId} onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/yugas' && isAdminAuthenticated && (
+          <YugasAdmin onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/yuga-edit' && isAdminAuthenticated && (
+          <YugaEditor yugaId={selectedYugaId} onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/timeline' && isAdminAuthenticated && (
+          <CmsManager sectionTitle="Timeline" sectionKey="timeline" onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/characters' && isAdminAuthenticated && (
+          <CmsManager sectionTitle="Characters" sectionKey="characters" onNavigate={handleUniversalNavigate} />
+        )}
+
+        {currentPage === 'admin/map' && isAdminAuthenticated && (
+          <CmsManager sectionTitle="Map" sectionKey="map" onNavigate={handleUniversalNavigate} />
         )}
 
         {currentPage === 'admin/dashboard' && isAdminAuthenticated && (

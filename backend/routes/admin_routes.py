@@ -11,6 +11,33 @@ from database.connection import get_db
 router = APIRouter(prefix="/admin", tags=["Admin Panel"])
 
 # ==========================================
+# AUDIT LOGGER HELPER
+# ==========================================
+LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "admin-txt")
+os.makedirs(LOG_DIR, exist_ok=True)
+LOG_FILE = os.path.join(LOG_DIR, "adminchange.txt")
+
+def log_admin_change(action_type: str, target_id: str, before_data: dict, after_data: dict):
+    """Appends structured before/after changes with dates and timestamps to adminchange.txt"""
+    now = datetime.now()
+    date_str = now.strftime("%Y-%m-%d")
+    time_str = now.strftime("%H:%M:%S")
+
+    log_entry = f"""------------------------------------
+{date_str}
+------------------------------------
+Time   : {time_str}
+Action : {action_type}
+Target : {target_id}
+BEFORE : {before_data}
+AFTER  : {after_data}
+
+"""
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(log_entry)
+
+
+# ==========================================
 # MODELS
 # ==========================================
 
@@ -54,6 +81,9 @@ def update_chapter(chapter_number: int, chapter: ChapterModel):
     db = get_db()
     existing_chapter = db.chapters.find_one({"chapter_number": chapter_number})
     old_data = existing_chapter if existing_chapter else {}
+    if "_id" in old_data:
+        old_data["_id"] = str(old_data["_id"])
+        
     new_data = chapter.dict()
 
     changes = []
@@ -68,6 +98,14 @@ def update_chapter(chapter_number: int, chapter: ChapterModel):
         {"chapter_number": chapter_number},
         {"$set": new_data},
         upsert=True
+    )
+
+    # Log to adminchange.txt
+    log_admin_change(
+        action_type="Update Chapter",
+        target_id=f"Chapter {chapter_number}",
+        before_data=old_data,
+        after_data=new_data
     )
 
     print("\n" + "="*50)
@@ -142,12 +180,16 @@ def update_shloka(id: str, payload: ShlokaUpdateModel):
     if not existing:
         raise HTTPException(status_code=404, detail="Shloka not found.")
 
+    # Prepare copy of existing doc for log snapshot
+    before_snapshot = dict(existing)
+    before_snapshot["_id"] = str(before_snapshot["_id"])
+
     update_data = {k: v for k, v in payload.dict().items() if v is not None}
     update_data["updatedAt"] = datetime.utcnow()
     
     changes = []
-    before_snapshot = {}
-    after_snapshot = {}
+    after_snapshot = dict(before_snapshot)
+    after_snapshot.update({k: v for k, v in update_data.items() if k != "updatedAt"})
 
     for key, new_val in update_data.items():
         if key == "updatedAt":
@@ -155,8 +197,6 @@ def update_shloka(id: str, payload: ShlokaUpdateModel):
         old_val = existing.get(key)
         if old_val != new_val:
             changes.append(f"Changed {key}")
-            before_snapshot[key] = old_val
-            after_snapshot[key] = new_val
 
     summary_text = ", ".join(changes) if changes else "No values were changed"
 
@@ -165,23 +205,16 @@ def update_shloka(id: str, payload: ShlokaUpdateModel):
         {"$set": update_data}
     )
 
+    # Log to adminchange.txt automatically
+    log_admin_change(
+        action_type="Update Shloka",
+        target_id=id,
+        before_data=before_snapshot,
+        after_data=after_snapshot
+    )
+
     print("\n" + "="*50)
     print(f"🔄 SHLOKA {id} UPDATED SUCCESSFULLY")
-    print("="*50)
-    print("--- BEFORE ---")
-    if before_snapshot:
-        for k, v in before_snapshot.items():
-            print(f"  {k}: {v}")
-    else:
-        print("  (No fields changed)")
-        
-    print("--- AFTER ---")
-    if after_snapshot:
-        for k, v in after_snapshot.items():
-            print(f"  {k}: {v}")
-    else:
-        print("  (No fields changed)")
-        
     print(f"Summary: {summary_text}")
     print("="*50 + "\n")
 
@@ -199,7 +232,6 @@ def update_shloka(id: str, payload: ShlokaUpdateModel):
 def delete_user_log(log_id: str):
     db = get_db()
     
-    # 1. Look up the document in MongoDB first to find its actual Google Sheet ID value
     doc = None
     try:
         obj_id = ObjectId(log_id)
@@ -212,10 +244,8 @@ def delete_user_log(log_id: str):
             "$or": [{"ID": log_id}, {"id": log_id}, {"id": int(log_id) if log_id.isdigit() else log_id}]
         })
 
-    # Extract the exact string/number used in the Google Sheet's "ID" column
     sheet_row_id = str(doc.get("ID") or doc.get("id") or log_id).strip() if doc else log_id
 
-    # 2. Delete from MongoDB collection
     try:
         if doc:
             mongo_result = db.users_sheet_logs.delete_one({"_id": doc["_id"]})
@@ -227,7 +257,6 @@ def delete_user_log(log_id: str):
             "$or": [{"ID": log_id}, {"id": log_id}, {"id": int(log_id) if log_id.isdigit() else log_id}]
         })
 
-    # 3. Delete from Google Sheets via SheetDB using the matching sheet row ID
     sheets_deleted = False
     try:
         sheetdb_url = f"https://sheetdb.io/api/v1/x84p8m28inivm/ID/{sheet_row_id}?sheet=Locked"

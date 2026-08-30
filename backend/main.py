@@ -13,6 +13,7 @@ from routes.chapters import router as chapters_router
 from routes.auth_logger import router as auth_logger_router
 from routes.admin_routes import router as admin_router
 from routes.admin_media import router as admin_media_router
+from routes.cms_routes import router as cms_router
 from database.connection import get_db
 
 load_dotenv()
@@ -50,6 +51,7 @@ app.include_router(chapters_router, prefix="/api")
 app.include_router(auth_logger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(admin_media_router, prefix="/api")
+app.include_router(cms_router, prefix="/api")
 
 # Admin Login Authentication Endpoint
 class AdminLoginRequest(BaseModel):

@@ -8,7 +8,11 @@ export default function AdminDashboard({ onNavigate }) {
   const menuItems = [
     { title: 'Chapters', path: 'admin/chapters' },
     { title: 'Shlokas', path: 'admin/shlokas' },
-    { title: 'Images & Media', path: 'admin/images' },
+    { title: 'Vedas', path: 'admin/vedas' },
+    { title: 'Yugas', path: 'admin/yugas' },
+    { title: 'Timeline', path: 'admin/timeline' },
+    { title: 'Characters', path: 'admin/characters' },
+    { title: 'Map', path: 'admin/map' },
     { title: 'User Logs', path: 'admin/dashboard' }
   ];
 
