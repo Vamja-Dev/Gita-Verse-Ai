@@ -131,7 +131,8 @@ export default function About() {
 
       {/* Full-width sticky footer pinned to the absolute bottom */}
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950 backdrop-blur-md border-t border-amber-500/10 w-full mt-auto">
-        © 2026 GitaVerse AI. All rights reserved.
+        © 2026 GitaVerse AI. AI-generated content may contain mistakes
+
       </footer>
     </div>
   );

@@ -264,7 +264,8 @@ export default function KurukshetraMap({ onNavigate }) {
       </div>
 
       <footer className="relative z-20 text-center py-6 text-xs text-[#4a2e12] font-sans tracking-widest uppercase font-semibold bg-[#dfcca7] backdrop-blur-md border-t border-[#5c3a21]/20">
-        © 2026 GitaVerse AI. All rights reserved.
+        © 2026 GitaVerse AI. AI-generated content may contain mistakes
+
       </footer>
     </main>
   );
