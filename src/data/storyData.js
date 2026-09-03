@@ -1,19 +1,40 @@
 // src/data/storyData.js
 import { shlokasData } from './shlokasData';
+
+// Import all 12 mixed local artwork files
 import img1 from '../assets/images/artwork-1.jpg';
 import img2 from '../assets/images/artwork-2.jpg';
 import img3 from '../assets/images/artwork-3.jpg';
+import img4 from '../assets/images/artwork-4.png';
+import img5 from '../assets/images/artwork-5.png';
+import img6 from '../assets/images/artwork-6.png';
+import img7 from '../assets/images/artwork-7.png';
+import img8 from '../assets/images/artwork-8.png';
+import img9 from '../assets/images/artwork-9.png';
+import img10 from '../assets/images/artwork-10.png';
+import img11 from '../assets/images/artwork-11.png';
+import img12 from '../assets/images/artwork-12.png';
 
-const artworkImages = [img1, img2, img3];
+const artworkImages = [
+  img1, img2, img3, img4, img5, img6, 
+  img7, img8, img9, img10, img11, img12
+];
 
-// Function to pull 3 unique, different random verses from shlokasData
+// Helper to shuffle any array randomly
+function getRandomSubset(pool, count = 3) {
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
+// Function to pull 3 unique, different random verses and match them with random unique images
 export const getStoryVerses = () => {
   try {
     const chapterKeys = Object.keys(shlokasData);
     if (chapterKeys.length === 0) return fallbackVerses;
 
     const generatedVerses = [];
-    const usedShlokas = new Set(); // Keeps track to avoid duplicate shlokas
+    const usedShlokas = new Set();
+    const selectedImages = getRandomSubset(artworkImages, 3);
     
     let attempts = 0;
     while (generatedVerses.length < 3 && attempts < 50) {
@@ -40,7 +61,7 @@ export const getStoryVerses = () => {
               hindi: verse.real_life_example?.hindi || verse.explanations?.hindi || "अपने दैनिक जीवन में इस दिव्य उपदेश का मनन करें।",
               gujarati: verse.real_life_example?.gujarati || verse.explanations?.gujarati || "તમારા દૈનિક જીવનમાં આ દિવ્ય ઉપદેશનું મનન કરો."
             },
-            image: artworkImages[i % artworkImages.length]
+            image: selectedImages[i] // Assigns a unique random image from our 12-image pool
           });
         }
       }

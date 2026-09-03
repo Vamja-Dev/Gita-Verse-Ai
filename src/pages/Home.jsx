@@ -2,44 +2,49 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
-import axios from 'axios';
 import CursorRevealSection from '../components/home/CursorRevealSection';
 import DailyWisdomCard from '../components/home/DailyWisdomCard';
 import ScrollStory from '../components/story/ScrollStory';
 import IntroLoader from '../components/story/IntroLoader';
 
-// Fallback core images
+// Full mixed local artwork pool (3 JPEGs and 9 PNGs)
 import artwork1 from '../assets/images/artwork-1.jpg';
 import artwork2 from '../assets/images/artwork-2.jpg';
 import artwork3 from '../assets/images/artwork-3.jpg';
+import artwork4 from '../assets/images/artwork-4.png';
+import artwork5 from '../assets/images/artwork-5.png';
+import artwork6 from '../assets/images/artwork-6.png';
+import artwork7 from '../assets/images/artwork-7.png';
+import artwork8 from '../assets/images/artwork-8.png';
+import artwork9 from '../assets/images/artwork-9.png';
+import artwork10 from '../assets/images/artwork-10.png';
+import artwork11 from '../assets/images/artwork-11.png';
+import artwork12 from '../assets/images/artwork-12.png';
+
+const localImagePool = [
+  artwork1, artwork2, artwork3, 
+  artwork4, artwork5, artwork6, 
+  artwork7, artwork8, artwork9, 
+  artwork10, artwork11, artwork12
+];
+
+// Helper function to guarantee 3 completely random, unique images from the pool on every execution
+function getRandomUniqueImages(pool, count = 3) {
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
 
 export default function Home({ onNavigate }) {
   const [loading, setLoading] = useState(() => {
     return !sessionStorage.getItem('hasSeenIntro');
   });
 
-  // Keep track of the dynamically selected unique random images for your 3 sections on refresh
-  const [randomizedImages, setRandomizedImages] = useState([artwork1, artwork2, artwork3]);
+  // Always compute 3 fresh unique random images directly on every mount/page refresh
+  const [randomizedImages, setRandomizedImages] = useState(() => getRandomUniqueImages(localImagePool, 3));
 
+  // Trigger a fresh shuffle every single time the Home page mounts or refreshes
   useEffect(() => {
-    axios.get('http://localhost:8000/api/admin/cms/home')
-      .then(res => {
-        const liveData = res.data.data || [];
-        if (liveData.length > 0) {
-          // For each home section pool, randomly pick one unique image on every refresh
-          const selectedImages = liveData.map(sec => {
-            const pool = sec.images && sec.images.length > 0 ? sec.images : [artwork1, artwork2, artwork3];
-            const randomIndex = Math.floor(Math.random() * pool.length);
-            return pool[randomIndex];
-          });
-          if (selectedImages.length >= 3) {
-            setRandomizedImages([selectedImages[0], selectedImages[1], selectedImages[2]]);
-          }
-        }
-      })
-      .catch(err => {
-        console.warn("Backend offline for home images, using default core art.");
-      });
+    setRandomizedImages(getRandomUniqueImages(localImagePool, 3));
   }, []);
 
   const handleLoaderComplete = () => {
@@ -79,12 +84,11 @@ export default function Home({ onNavigate }) {
         <DailyWisdomCard />
       </section>
 
-      {/* Passing the dynamically rotated random images down to ScrollStory */}
+      {/* Passing the dynamically rotated random unique images down to ScrollStory */}
       <ScrollStory customImages={randomizedImages} />
 
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/60 backdrop-blur-md border-t border-amber-500/10">
         © 2026 GitaVerse AI. AI-generated content may contain mistakes
-
       </footer>
     </motion.main>
   );

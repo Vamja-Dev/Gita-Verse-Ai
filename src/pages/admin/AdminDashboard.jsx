@@ -6,7 +6,6 @@ export default function AdminDashboard({ onNavigate }) {
   const [activeTab, setActiveTab] = useState(null);
 
   const menuItems = [
-    { title: 'Home Sections', path: 'admin/home' },
     { title: 'Chapters', path: 'admin/chapters' },
     { title: 'Shlokas', path: 'admin/shlokas' },
     { title: 'Vedas', path: 'admin/vedas' },

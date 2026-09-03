@@ -37,8 +37,6 @@ import CharactersAdmin from './pages/admin/CharactersAdmin';
 import CharacterEditor from './pages/admin/CharacterEditor';
 import MapAdmin from './pages/admin/MapAdmin';
 import MapEditor from './pages/admin/MapEditor';
-import HomeAdmin from './pages/admin/HomeAdmin';
-import HomeEditor from './pages/admin/HomeEditor';
 
 // Import all 18 chapter images
 import chp1 from './assets/images/ch-1.jpg';
@@ -76,7 +74,6 @@ export default function App() {
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
   const [selectedMapId, setSelectedMapId] = useState(null);
-  const [selectedHomeId, setSelectedHomeId] = useState(null);
 
   // Track admin authentication status securely in session/state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
@@ -120,10 +117,6 @@ export default function App() {
         const parts = path.split('/');
         setSelectedMapId(parts[2]);
         setCurrentPage('admin/map-edit');
-      } else if (path.startsWith('/admin/home/') && path.endsWith('/edit')) {
-        const parts = path.split('/');
-        setSelectedHomeId(parts[2]);
-        setCurrentPage('admin/home-edit');
       } else {
         setCurrentPage(path.substring(1));
       }
@@ -226,15 +219,6 @@ export default function App() {
       return;
     }
 
-    if (typeof pageOrAction === 'string' && pageOrAction.startsWith('admin/home/') && pageOrAction.endsWith('/edit')) {
-      const parts = pageOrAction.split('/');
-      setSelectedHomeId(parts[2]);
-      setCurrentPage('admin/home-edit');
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      window.history.pushState({}, '', `/${pageOrAction}`);
-      return;
-    }
-
     if (pageOrAction === 'shloka-detail-direct' && payload) {
       setSelectedChapterNum(payload.chapterNumber);
       setSelectedShlokaNum(payload.shlokaNumber);
@@ -286,14 +270,6 @@ export default function App() {
           ) : (
             <AdminLogin onNavigate={handleUniversalNavigate} />
           )
-        )}
-
-        {currentPage === 'admin/home' && isAdminAuthenticated && (
-          <HomeAdmin onNavigate={handleUniversalNavigate} />
-        )}
-
-        {currentPage === 'admin/home-edit' && isAdminAuthenticated && (
-          <HomeEditor sectionId={selectedHomeId} onNavigate={handleUniversalNavigate} />
         )}
 
         {currentPage === 'admin/chapters' && isAdminAuthenticated && (
