@@ -9,27 +9,6 @@ export default function Meditation({ onNavigate }) {
   const [duration, setDuration] = useState(0);
   const audioRef = useRef(null);
 
-  // Breathing animation states
-  const [breathState, setBreathState] = useState('Inhale');
-  const [breathText, setBreathText] = useState('Breathe In deeply...');
-
-  useEffect(() => {
-    const cycle = setTimeout(() => {
-      if (breathState === 'Inhale') {
-        setBreathState('Hold');
-        setBreathText('Hold your breath...');
-      } else if (breathState === 'Hold') {
-        setBreathState('Exhale');
-        setBreathText('Release and Exhale...');
-      } else {
-        setBreathState('Inhale');
-        setBreathText('Breathe In deeply...');
-      }
-    }, 4000);
-
-    return () => clearTimeout(cycle);
-  }, [breathState]);
-
   // Track list using your exact local filenames
   const musicTracks = [
     { 
@@ -149,7 +128,7 @@ export default function Meditation({ onNavigate }) {
         </div>
 
         {/* Sacred Ambient Soundscapes Section */}
-        <div className="space-y-6">
+        <div className="space-y-6 pb-12">
           <div className="flex items-center gap-2 border-b border-amber-500/20 pb-4">
             <Music className="w-5 h-5 text-amber-400" />
             <h2 className="text-xl font-serif text-amber-200 tracking-wide">Sacred Ambient Soundscapes</h2>
@@ -218,35 +197,10 @@ export default function Meditation({ onNavigate }) {
           </div>
         </div>
 
-        {/* Interactive Breathing Animation Circle */}
-        <div className="relative rounded-3xl overflow-hidden border border-amber-500/30 bg-[#0d0914]/75 backdrop-blur-md p-8 md:p-14 shadow-[0_20px_60px_rgba(0,0,0,0.8)] text-center space-y-8 mb-12">
-          <div className="absolute inset-0 bg-gradient-to-t from-amber-600/10 via-transparent to-purple-950/20 pointer-events-none" />
-          
-          <div className="relative z-10 space-y-2">
-            <span className="text-xs font-sans text-amber-400 uppercase tracking-[0.3em]">Guided Pranayama</span>
-            <h2 className="text-2xl font-serif text-amber-100">Synchronize Your Breath</h2>
-          </div>
-
-          <div className="relative z-10 flex items-center justify-center py-6">
-            <motion.div
-              animate={{
-                scale: breathState === 'Inhale' ? 1.35 : breathState === 'Hold' ? 1.35 : 1,
-                opacity: breathState === 'Hold' ? 0.9 : 0.6
-              }}
-              transition={{ duration: 4, ease: "easeInOut" }}
-              className="w-52 h-52 md:w-64 md:h-64 rounded-full bg-gradient-to-tr from-amber-600/30 via-amber-400/20 to-purple-600/30 border-2 border-amber-400/60 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(245,158,11,0.4)]"
-            >
-              <span className="text-xl md:text-2xl font-serif text-amber-200 uppercase tracking-widest">{breathState}</span>
-              <span className="text-xs font-sans text-amber-300/90 pt-2">{breathText}</span>
-            </motion.div>
-          </div>
-        </div>
-
       </div>
 
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/50 font-sans tracking-widest uppercase bg-slate-950/40 backdrop-blur-md border-t border-amber-500/10">
         © 2026 GitaVerse AI. AI-generated content may contain mistakes
-
       </footer>
     </main>
   );

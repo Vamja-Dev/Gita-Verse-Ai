@@ -1,6 +1,7 @@
+// src/pages/UserDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { Bookmark, Trash2, ExternalLink } from 'lucide-react';
-import Background from '../components/Background';
+import dashboardBg from '../assets/images/timeline-bg.png';
 
 export default function UserDashboard({ onNavigate }) {
   const [savedShlokas, setSavedShlokas] = useState([]);
@@ -36,15 +37,18 @@ export default function UserDashboard({ onNavigate }) {
   };
 
   return (
-    <main className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-[#06040a]">
-      <Background />
-
+    <main 
+      className="relative w-full min-h-screen text-slate-100 font-serif overflow-x-hidden bg-cover bg-center bg-fixed"
+      style={{ 
+        backgroundImage: `linear-gradient(to bottom, rgba(6, 4, 10, 0.4), rgba(6, 4, 10, 0.6)), url(${dashboardBg})` 
+      }}
+    >
       <div className="relative z-20 pt-28 pb-24 px-6 md:px-16 max-w-5xl mx-auto space-y-10">
 
-        {/* Profile Card Header */}
-        <div className="bg-[#0d0914]/90 backdrop-blur-xl border border-amber-500/30 rounded-3xl p-8 flex items-center justify-between shadow-2xl">
+        {/* Profile Card Header with high transparency */}
+        <div className="bg-[#06040a]/40 backdrop-blur-md border border-amber-500/30 rounded-3xl p-8 flex items-center justify-between shadow-2xl">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-3xl font-serif">
+            <div className="w-20 h-20 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-3xl font-serif shadow-[0_0_15px_rgba(245,158,11,0.2)]">
               ॐ
             </div>
             <div>
@@ -54,8 +58,8 @@ export default function UserDashboard({ onNavigate }) {
           </div>
         </div>
 
-        {/* Saved Shlokas Section */}
-        <div className="bg-[#0d0914]/80 backdrop-blur-xl border border-amber-500/20 rounded-3xl p-8 shadow-xl space-y-6">
+        {/* Saved Shlokas Section with high transparency */}
+        <div className="bg-[#06040a]/40 backdrop-blur-md border border-amber-500/20 rounded-3xl p-8 shadow-xl space-y-6">
           <div className="flex items-center justify-between border-b border-amber-500/20 pb-4">
             <div className="flex items-center gap-3">
               <Bookmark className="w-6 h-6 text-amber-400" />
@@ -74,7 +78,7 @@ export default function UserDashboard({ onNavigate }) {
               {savedShlokas.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#160f22]/80 border border-amber-500/20 hover:border-amber-500/50 transition-all rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group shadow-lg"
+                  className="bg-[#06040a]/50 backdrop-blur-sm border border-amber-500/20 hover:border-amber-500/50 transition-all rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group shadow-lg"
                 >
                   <div className="space-y-1 cursor-pointer flex-1" onClick={() => handleNavigateToShloka(item.chapterId, item.shlokaId)}>
                     <div className="flex items-center gap-2">
