@@ -1,7 +1,7 @@
 // src/components/story/ChapterDetailView.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, AlertCircle, X } from 'lucide-react';
+import { Bookmark, AlertCircle, X, Video } from 'lucide-react';
 import { shlokasData as fallbackShlokasData } from '../../data/shlokasData';
 import { chaptersData } from '../../data/chaptersData';
 import GitaAudioPlayer, { stopGlobalAudio } from '../../components/GitaAudioPlayer';
@@ -15,6 +15,10 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [savedShlokasMap, setSavedShlokasMap] = useState({});
     
+    // State for Chapter Video Modal & playback control
+    const [showChapterVideo, setShowChapterVideo] = useState(false);
+    const videoRef = useRef(null);
+
     // State for verses fetched from MongoDB backend API
     const [verses, setVerses] = useState([]);
     const [loadingVerses, setLoadingVerses] = useState(true);
@@ -77,6 +81,15 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         }
     };
 
+    // Helper to close Chapter Video modal and reset/pause video element cleanly
+    const handleCloseVideoModal = () => {
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+        }
+        setShowChapterVideo(false);
+    };
+
     // Load user-specific saved shlokas state on mount or change
     const userEmail = localStorage.getItem('gitaverse_user_email');
     const userName = localStorage.getItem('gitaverse_user_name');
@@ -107,17 +120,41 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         }
     }, [userEmail, isLoggedIn]);
 
-    // Cleanup speech when component unmounts
+    // Cleanup speech & pause video when component unmounts or chapter changes
     useEffect(() => {
         return () => {
             stopSpeaking();
+            if (videoRef.current) {
+                videoRef.current.pause();
+            }
         };
-    }, []);
+    }, [chapterNumber]);
+
+    // Escape key listener for closing modals smoothly
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                if (showChapterVideo) {
+                    handleCloseVideoModal();
+                }
+                if (selectedImage) {
+                    setSelectedImage(false);
+                }
+                if (selectedShloka) {
+                    handleCloseModal();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showChapterVideo, selectedImage, selectedShloka]);
 
     const chapterInfo = chaptersData.find(c => (c.number || c.chapter_number) === chapterNumber) || {
         englishName: `Chapter ${chapterNumber}`,
         sanskritName: ''
     };
+
+    const chapterVideoPath = `/videos/chapters/ch-${chapterNumber}-video.mp4`;
 
     const filteredVerses = verses.filter(v => {
         const term = searchVerse.toLowerCase().trim();
@@ -180,7 +217,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
             />
 
             {/* Top Header Controls */}
-            <div className="relative z-20 w-full max-w-5xl flex items-center justify-between mb-8">
+            <div className="relative z-20 w-full max-w-5xl flex items-center justify-between mb-8 flex-wrap gap-4">
                 <button
                     onClick={handleBackClick}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2c1810] border border-amber-600/40 text-amber-300 hover:bg-amber-600 hover:text-slate-950 transition-all duration-300 text-sm font-sans font-medium shadow-lg cursor-pointer"
@@ -188,21 +225,37 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                     ← Back to Chapters
                 </button>
 
-                {/* Small Clickable HD Art Box */}
-                <div
-                    onClick={() => setSelectedImage(true)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#2c1810]/90 border border-amber-600/40 backdrop-blur-md shadow-xl cursor-pointer hover:border-amber-400 transition-all group"
-                >
-                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-amber-600/50 shadow-inner">
-                        <img
-                            src={backgroundImages?.[chapterNumber - 1] || ''}
-                            alt={`Chapter ${chapterNumber}`}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
+                {/* Right Side Action Boxes: [ CHAPTER VIDEO ] [ CHAPTER ART ] */}
+                <div className="flex items-center gap-3 flex-wrap">
+                    {/* Chapter Video Box */}
+                    <div
+                        onClick={() => setShowChapterVideo(true)}
+                        className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#2c1810]/90 border border-amber-600/40 backdrop-blur-md shadow-xl cursor-pointer hover:border-amber-400 transition-all group"
+                    >
+                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-amber-950/60 border border-amber-600/50 shadow-inner flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+                            <Video className="w-5 h-5 text-amber-400" />
+                        </div>
+                        <span className="text-xs uppercase tracking-widest text-amber-300 font-sans font-semibold">
+                            Chapter {chapterNumber} Video
+                        </span>
                     </div>
-                    <span className="text-xs uppercase tracking-widest text-amber-300 font-sans font-semibold hidden sm:inline">
-                        Chapter {chapterNumber} Art
-                    </span>
+
+                    {/* Small Clickable HD Art Box */}
+                    <div
+                        onClick={() => setSelectedImage(true)}
+                        className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#2c1810]/90 border border-amber-600/40 backdrop-blur-md shadow-xl cursor-pointer hover:border-amber-400 transition-all group"
+                    >
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-amber-600/50 shadow-inner">
+                            <img
+                                src={backgroundImages?.[chapterNumber - 1] || ''}
+                                alt={`Chapter ${chapterNumber}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <span className="text-xs uppercase tracking-widest text-amber-300 font-sans font-semibold hidden sm:inline">
+                            Chapter {chapterNumber} Art
+                        </span>
+                    </div>
                 </div>
             </div>
 
@@ -301,6 +354,68 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                     )}
                 </div>
             </div>
+
+            {/* CHAPTER VIDEO MODAL */}
+            <AnimatePresence>
+                {showChapterVideo && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={handleCloseVideoModal}
+                            className="absolute inset-0 bg-slate-950/9italics backdrop-blur-md"
+                        />
+
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeOut' }}
+                            className="relative z-10 w-full max-w-5xl rounded-3xl overflow-hidden border border-amber-500/40 bg-[#120a1d] shadow-2xl flex flex-col"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Modal Header */}
+                            <div className="flex items-center justify-between px-6 py-4 bg-[#1a0f08] border-b border-amber-500/20">
+                                <div className="flex items-center gap-2">
+                                    <Video className="w-5 h-5 text-amber-400" />
+                                    <h3 className="text-lg font-bold text-amber-200 tracking-wide font-sans uppercase">
+                                        Chapter {chapterNumber} Video
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={handleCloseVideoModal}
+                                    className="w-9 h-9 rounded-full bg-amber-500/10 text-amber-300 flex items-center justify-center hover:bg-amber-600 hover:text-slate-950 transition-all font-sans font-bold cursor-pointer"
+                                    aria-label="Close modal"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Video Player Container */}
+                            <div className="relative w-full aspect-video bg-black flex items-center justify-center">
+                                <video
+                                    ref={videoRef}
+                                    src={chapterVideoPath}
+                                    controls
+                                    playsInline
+                                    className="w-full h-full object-contain"
+                                    onError={(e) => {
+                                        console.warn("Chapter video is currently unavailable or failed to load:", e);
+                                    }}
+                                >
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            {/* Modal Footer Info */}
+                            <div className="px-6 py-3 bg-[#1a0f08] border-t border-amber-500/20 text-center text-xs text-slate-400 font-sans">
+                                 Chapter {chapterNumber} • {chapterInfo.englishName}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             {/* PERFECTLY WIDE-ROLLED SCROLL MODAL ANIMATION */}
             <AnimatePresence>
