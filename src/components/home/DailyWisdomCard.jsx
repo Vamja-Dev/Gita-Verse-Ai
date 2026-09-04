@@ -123,7 +123,7 @@ export default function DailyWisdomCard() {
           <div className="flex items-center justify-between mb-6 border-b border-amber-500/20 pb-4">
             <div className="flex items-center gap-2 text-amber-400 font-sans text-xs uppercase tracking-[0.25em] font-bold">
               <Sparkles size={16} className="text-amber-400 animate-pulse" />
-              <span>Today's Divine Wisdom</span>
+              <span>Divine Wisdom</span>
             </div>
             <span className="text-xs font-serif text-amber-200/90 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
               {wisdom.chapterLabel}

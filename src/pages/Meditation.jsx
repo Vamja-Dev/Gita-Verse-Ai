@@ -200,7 +200,7 @@ export default function Meditation({ onNavigate }) {
       </div>
 
       <footer className="relative z-20 text-center py-6 text-xs text-amber-200/50 font-sans tracking-widest uppercase bg-slate-950/40 backdrop-blur-md border-t border-amber-500/10">
-        © 2026 GitaVerse AI. AI-generated content may contain mistakes
+        © 2026 GitaVerse AI. AI-generated content may contain mistakes.
       </footer>
     </main>
   );

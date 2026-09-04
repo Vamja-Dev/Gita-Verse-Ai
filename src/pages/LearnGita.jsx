@@ -117,7 +117,7 @@ export default function LearnGita({ onNavigate, onSelectChapter }) {
       </main>
 
       <footer className="relative z-20 w-full text-center py-6 text-xs text-amber-200/50 font-sans tracking-widest uppercase bg-[#140a05]/90 backdrop-blur-md border-t border-amber-600/20">
-        © 2026 GitaVerse AI. AI-generated content may contain mistakes
+        © 2026 GitaVerse AI. AI-generated content may contain mistakes.
 
       </footer>
     </motion.div>
