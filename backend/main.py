@@ -14,6 +14,7 @@ from routes.auth_logger import router as auth_logger_router
 from routes.admin_routes import router as admin_router
 from routes.admin_media import router as admin_media_router
 from routes.cms_routes import router as cms_router
+from routes.chat_history import router as chat_history_router
 from database.connection import get_db
 
 load_dotenv()
@@ -52,6 +53,7 @@ app.include_router(auth_logger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(admin_media_router, prefix="/api")
 app.include_router(cms_router, prefix="/api")
+app.include_router(chat_history_router, prefix="/api")
 
 # Admin Login Authentication Endpoint
 class AdminLoginRequest(BaseModel):

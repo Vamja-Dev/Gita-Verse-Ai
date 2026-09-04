@@ -30,7 +30,6 @@ export default function ChatBox({ onSend, onNavigate }) {
   const userEmail = localStorage.getItem('gitaverse_user_email');
   const userName = localStorage.getItem('gitaverse_user_name');
   const isLoggedIn = Boolean(userEmail && userEmail !== 'N/A' && userName && userName !== 'Seeker');
-  const historyKey = `gitaverse_chat_history_${userEmail}`;
 
   // Speech recognition ref
   const recognitionRef = useRef(null);
@@ -46,13 +45,29 @@ export default function ChatBox({ onSend, onNavigate }) {
 
   const textareaRef = useRef(null);
 
-  // Load chat history on mount if logged in
+  // PART 8 & 10: Load chat history from MongoDB via Python Backend API on mount if logged in
   useEffect(() => {
-    if (isLoggedIn) {
-      const savedHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
-      setChatHistory(savedHistory);
-    }
-  }, [isLoggedIn, historyKey]);
+    const fetchHistoryFromBackend = async () => {
+      if (!isLoggedIn) {
+        setChatHistory([]);
+        return;
+      }
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/chat-history', {
+          method: 'GET',
+          headers: { 'X-User-Email': userEmail }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setChatHistory(data.history);
+        }
+      } catch (err) {
+        console.error("Failed to load history from backend:", err);
+      }
+    };
+
+    fetchHistoryFromBackend();
+  }, [isLoggedIn, userEmail]);
 
   // Lock body scroll while the history panel is open
   useEffect(() => {
@@ -62,35 +77,69 @@ export default function ChatBox({ onSend, onNavigate }) {
     };
   }, [showHistoryDrawer]);
 
-  // Save successful response to user history
-  const saveToHistory = (userQuery, data) => {
+  // PART 7: Save successful response to MongoDB via Python Backend API
+  const saveToHistory = async (userQuery, data) => {
     if (!isLoggedIn) return;
 
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const newHistoryItem = {
-      id: Date.now(),
-      timestamp: `Today • ${timeStr}`,
-      prompt: userQuery,
-      response: data,
-    };
-
-    const existing = JSON.parse(localStorage.getItem(historyKey)) || [];
-    const updated = [newHistoryItem, ...existing];
-    localStorage.setItem(historyKey, JSON.stringify(updated));
-    setChatHistory(updated);
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/chat-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': userEmail
+        },
+        body: JSON.stringify({
+          user_email: userEmail,
+          user_name: userName,
+          prompt: userQuery,
+          response: data,
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        // Refresh history list from backend
+        const histRes = await fetch('http://127.0.0.1:8000/api/chat-history', {
+          headers: { 'X-User-Email': userEmail }
+        });
+        const histData = await histRes.json();
+        if (histData.success) {
+          setChatHistory(histData.history);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to save history entry to MongoDB:", err);
+    }
   };
 
-  const handleDeleteHistoryItem = (id, e) => {
+  const handleDeleteHistoryItem = async (id, e) => {
     e.stopPropagation();
-    const updated = chatHistory.filter((item) => item.id !== id);
-    localStorage.setItem(historyKey, JSON.stringify(updated));
-    setChatHistory(updated);
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/chat-history/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-User-Email': userEmail }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setChatHistory(prev => prev.filter(item => item.id !== id));
+      }
+    } catch (err) {
+      console.error("Failed to delete history item:", err);
+    }
   };
 
-  const handleClearAllHistory = () => {
-    localStorage.removeItem(historyKey);
-    setChatHistory([]);
+  const handleClearAllHistory = async () => {
+    // Sequentially delete active items
+    try {
+      for (const item of chatHistory) {
+        await fetch(`http://127.0.0.1:8000/api/chat-history/${item.id}`, {
+          method: 'DELETE',
+          headers: { 'X-User-Email': userEmail }
+        });
+      }
+      setChatHistory([]);
+    } catch (err) {
+      console.error("Failed to clear all history:", err);
+    }
   };
 
   // Initialize browser speech recognition on mount
@@ -167,7 +216,7 @@ export default function ChatBox({ onSend, onNavigate }) {
 
       setResponseResult(data);
       if (data.success) {
-        saveToHistory(userQuery, data);
+        await saveToHistory(userQuery, data);
         if (onSend) onSend(data);
       }
     } catch (err) {
@@ -268,7 +317,7 @@ export default function ChatBox({ onSend, onNavigate }) {
                 </div>
                 <p className="text-amber-100 font-serif font-bold text-sm">Your Spiritual History</p>
                 <p className="text-amber-200/50 text-[11px] font-sans mt-1">
-                  {chatHistory.length} saved {chatHistory.length === 1 ? 'conversation' : 'conversations'}
+                  {chatHistory.length} saved {chatHistory.length === 1 ? 'conversation' : 'conversations'} (MongoDB)
                 </p>
               </div>
             </div>
@@ -281,42 +330,45 @@ export default function ChatBox({ onSend, onNavigate }) {
                 </p>
               ) : (
                 <div className="space-y-1">
-                  {chatHistory.map((item) => (
-                    <div
-                      key={item.id}
-                      className="w-full px-3 py-3.5 rounded-xl hover:bg-amber-500/10 transition-colors border-b border-amber-500/5 last:border-b-0"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[10px] text-amber-400/60 font-sans mb-1">{item.timestamp}</p>
-                          <p className="text-xs text-amber-100 font-serif italic leading-relaxed line-clamp-2">
-                            "{item.prompt}"
-                          </p>
-                          <p className="text-[10px] text-amber-300/70 font-sans font-semibold mt-1.5">
-                            Chapter {item.response.primary_shloka?.chapter} • Shloka {item.response.primary_shloka?.shloka_number}
-                          </p>
+                  {chatHistory.map((item) => {
+                    const formattedDate = item.timestamp ? new Date(item.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '';
+                    return (
+                      <div
+                        key={item.id}
+                        className="w-full px-3 py-3.5 rounded-xl hover:bg-amber-500/10 transition-colors border-b border-amber-500/5 last:border-b-0"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[10px] text-amber-400/60 font-sans mb-1">{formattedDate}</p>
+                            <p className="text-xs text-amber-100 font-serif italic leading-relaxed line-clamp-2">
+                              "{item.prompt}"
+                            </p>
+                            <p className="text-[10px] text-amber-300/70 font-sans font-semibold mt-1.5">
+                              Chapter {item.response.primary_shloka?.chapter} • Shloka {item.response.primary_shloka?.shloka_number}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => handleDeleteHistoryItem(item.id, e)}
+                            className="text-red-400/50 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0 pt-0.5"
+                            title="Delete"
+                          >
+                            <FaTrash size={11} />
+                          </button>
                         </div>
+
                         <button
-                          onClick={(e) => handleDeleteHistoryItem(item.id, e)}
-                          className="text-red-400/50 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0 pt-0.5"
-                          title="Delete"
+                          onClick={() => {
+                            setResponseResult(item.response);
+                            setShowHistoryDrawer(false);
+                          }}
+                          className="mt-2 flex items-center gap-1.5 text-[11px] font-sans font-bold text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
                         >
-                          <FaTrash size={11} />
+                          View Response
+                          <FaChevronRight size={9} />
                         </button>
                       </div>
-
-                      <button
-                        onClick={() => {
-                          setResponseResult(item.response);
-                          setShowHistoryDrawer(false);
-                        }}
-                        className="mt-2 flex items-center gap-1.5 text-[11px] font-sans font-bold text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
-                      >
-                        View Response
-                        <FaChevronRight size={9} />
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
