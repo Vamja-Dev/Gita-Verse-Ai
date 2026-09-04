@@ -64,13 +64,13 @@ export default function CharacterEncyclopedia({ onNavigate }) {
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-sans tracking-widest uppercase backdrop-blur-md shadow-[0_0_25px_rgba(245,158,11,0.15)]">
             <User className="w-4 h-4 text-amber-400" />
-            <span>Legendary Figures • Character Encyclopedia</span>
+            <span> Mahabharata • Character Encyclopedia</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-serif text-amber-100 tracking-wide drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]">
             Souls of the Epic
           </h1>
           <p className="text-sm md:text-base font-sans text-slate-300/80 font-light leading-relaxed">
-            Discover the profound roles, philosophies, and destinies of all {characters.length} iconic figures of Mahabharata.
+            Discover the profound roles, philosophies, and destinies of all {characters.length} iconic characters of Mahabharata.
           </p>
 
           {/* Faction Filter Buttons */}

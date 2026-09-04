@@ -1,7 +1,7 @@
 // src/components/story/ChapterDetailView.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bookmark, AlertCircle, X, Video } from 'lucide-react';
+import { Bookmark, AlertCircle, X, Video, ArrowUp } from 'lucide-react';
 import { shlokasData as fallbackShlokasData } from '../../data/shlokasData';
 import { chaptersData } from '../../data/chaptersData';
 import GitaAudioPlayer, { stopGlobalAudio } from '../../components/GitaAudioPlayer';
@@ -18,6 +18,10 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     // State for Chapter Video Modal & playback control
     const [showChapterVideo, setShowChapterVideo] = useState(false);
     const videoRef = useRef(null);
+
+    // Refs for scroll containers
+    const scrollContainerRef = useRef(null);
+    const [showScrollTop, setShowScrollTop] = useState(false);
 
     // State for verses fetched from MongoDB backend API
     const [verses, setVerses] = useState([]);
@@ -199,6 +203,20 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
         localStorage.setItem(storageKey, JSON.stringify(savedList));
     };
 
+    const handleScrollContainerScroll = (e) => {
+        if (e.currentTarget.scrollTop > 200) {
+            setShowScrollTop(true);
+        } else {
+            setShowScrollTop(false);
+        }
+    };
+
+    const scrollToTopWithinModal = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -364,7 +382,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={handleCloseVideoModal}
-                            className="absolute inset-0 bg-slate-950/9italics backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-950/90 backdrop-blur-md"
                         />
 
                         <motion.div
@@ -410,7 +428,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
 
                             {/* Modal Footer Info */}
                             <div className="px-6 py-3 bg-[#1a0f08] border-t border-amber-500/20 text-center text-xs text-slate-400 font-sans">
-                                 Chapter {chapterNumber} • {chapterInfo.englishName}
+                                Chapter {chapterNumber} • {chapterInfo.englishName}
                             </div>
                         </motion.div>
                     </div>
@@ -452,6 +470,8 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
 
                             {/* Scroll Paper Body */}
                             <div
+                                ref={scrollContainerRef}
+                                onScroll={handleScrollContainerScroll}
                                 className="relative z-20 w-full px-8 md:px-16 py-10 space-y-6 font-serif shadow-2xl rounded-sm overflow-y-auto scrollbar-none max-h-[75vh]"
                                 style={{
                                     backgroundColor: '#f5e5c8',
@@ -655,6 +675,22 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Floating "Go to Top" button styled with the exact same theme and colors, placed on the bottom right inside the scroll body */}
+                                {showScrollTop && (
+                                    <div className="sticky bottom-4 z-50 flex justify-end pr-0 -mr-13 pointer-events-none">
+                                        <motion.button
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.8 }}
+                                            onClick={scrollToTopWithinModal}
+                                            className="pointer-events-auto p-3 rounded-2xl bg-[#3d2314] text-amber-300 border border-amber-500/50 shadow-xl hover:bg-amber-600 hover:text-slate-950 transition-all cursor-pointer flex items-center justify-center"
+                                            title="Scroll to Top"
+                                        >
+                                            <ArrowUp className="w-5 h-5" />
+                                        </motion.button>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Scroll Bottom Roller */}
