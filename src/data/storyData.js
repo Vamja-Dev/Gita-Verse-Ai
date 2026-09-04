@@ -20,13 +20,13 @@ const artworkImages = [
   img7, img8, img9, img10, img11, img12
 ];
 
-// Helper to shuffle any array randomly
+// Helper to shuffle any array randomly (set count to 3)
 function getRandomSubset(pool, count = 3) {
   const shuffled = [...pool].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
 
-// Function to pull 3 unique, different random verses and match them with random unique images
+// Function to pull 3 unique, different random verses and match them with 3 unique images
 export const getStoryVerses = () => {
   try {
     const chapterKeys = Object.keys(shlokasData);
@@ -50,11 +50,14 @@ export const getStoryVerses = () => {
           usedShlokas.add(uniqueKey);
           const i = generatedVerses.length;
 
+          // Strictly 3 layouts: right, left, right
+          const layouts = ["right", "left", "right"];
+
           generatedVerses.push({
             id: i + 1,
             chapterNum: randomChapterKey,
             shlokaNum: verse.shloka_number,
-            layout: i === 0 ? "center" : i === 1 ? "left" : "right",
+            layout: layouts[i],
             sanskrit: verse.sanskrit,
             realLifeExamples: {
               english: verse.real_life_example?.english || verse.explanations?.english || "Reflect upon this divine teaching in your daily journey.",
@@ -79,12 +82,12 @@ const fallbackVerses = [
     id: 1,
     chapterNum: "2",
     shlokaNum: "47",
-    layout: "center",
+    layout: "right",
     sanskrit: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
     realLifeExamples: {
       english: "Focus entirely on your present effort and duty without anxiety over future outcomes.",
       hindi: "भविष्य के परिणामों की चिंता किए बिना पूरी तरह से अपने वर्तमान कर्म और कर्तव्य पर ध्यान केंद्रित करें.",
-      gujarati: "ભવિષ્યના પરિણામોની ચિંता કર્યા વગર તમારા વર્તમાન કર્મ અને ફરજ પર સંપૂર્ણ ધ્યાન કેન્દ્રિત કરો."
+      gujarati: "ભવિષ્યના પરિણામોની ચિંતા કર્યા વગર તમારા વર્તમાન કર્મ અને ફરજ પર સંપૂર્ણ ધ્યાન કેન્દ્રિત કરો."
     },
     image: img1
   },

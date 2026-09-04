@@ -54,12 +54,6 @@ export default function Home({ onNavigate }) {
 
   return (
     <>
-      {/* The home screen is ALWAYS mounted, even while the intro is playing.
-          This is what makes the lantern-curtain reveal in IntroLoader work
-          correctly — when that overlay slides up and off, real, fully
-          rendered content is already sitting underneath it, so the reveal
-          is instant and seamless instead of a blank flash while React
-          mounts the home screen for the first time. */}
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -87,7 +81,7 @@ export default function Home({ onNavigate }) {
           <DailyWisdomCard />
         </section>
 
-        {/* Passing the dynamically rotated random unique images down to ScrollStory */}
+        {/* Passing the 3 dynamically rotated unique images down to ScrollStory */}
         <ScrollStory customImages={randomizedImages} />
 
         <footer className="relative z-20 text-center py-6 text-xs text-amber-200/40 font-sans tracking-widest uppercase bg-slate-950/60 backdrop-blur-md border-t border-amber-500/10">
