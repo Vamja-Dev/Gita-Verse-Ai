@@ -317,7 +317,7 @@ export default function ChatBox({ onSend, onNavigate }) {
                 </div>
                 <p className="text-amber-100 font-serif font-bold text-sm">Your Spiritual History</p>
                 <p className="text-amber-200/50 text-[11px] font-sans mt-1">
-                  {chatHistory.length} saved {chatHistory.length === 1 ? 'conversation' : 'conversations'} (MongoDB)
+                  {chatHistory.length} saved {chatHistory.length === 1 ? 'conversation' : 'conversations'}
                 </p>
               </div>
             </div>
