@@ -47,7 +47,8 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Register all API routers under /api
 app.include_router(chat_router, prefix="/api")
-app.include_router(shlokas_router, prefix="/api")
+app.include_router(shlokas_router, prefix="/api/admin")  # Handles /api/admin/shlokas
+app.include_router(shlokas_router, prefix="/api")        # Handles public /api/shlokas?chapter=... requests
 app.include_router(chapters_router, prefix="/api")
 app.include_router(auth_logger_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
@@ -66,6 +67,11 @@ def admin_login(creds: AdminLoginRequest):
         print("Admin login success: Administrator authenticated successfully.")
         return {"status": "success", "message": "Admin authenticated"}
     raise HTTPException(status_code=401, detail="Invalid admin credentials")
+
+@app.post("/api/admin/logout")
+def admin_logout():
+    print("Admin logout success: Administrator logged out successfully.")
+    return {"status": "success", "message": "Admin logged out"}
 
 @app.get("/api/health")
 def health_check():

@@ -23,7 +23,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh] text-white admin-login-wrapper">
+    // Added 'login-container' here to inherit proper text-transform and font settings
+    <div className="flex justify-center items-center min-h-[80vh] text-white login-container admin-login-wrapper">
       <form onSubmit={handleLogin} className="glass-panel bg-gray-900 border border-gray-800 p-8 rounded-lg w-full max-w-md shadow-lg">
         <h2 className="text-2xl font-bold mb-6 text-amber-500 text-center font-['Cinzel']">Admin Login</h2>
         <div className="mb-4">

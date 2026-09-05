@@ -1,4 +1,3 @@
-# backend/routes/cms_routes.py
 import os
 from datetime import datetime
 from fastapi import APIRouter, HTTPException
@@ -13,7 +12,9 @@ os.makedirs(LOG_DIR, exist_ok=True)
 LOG_FILE = os.path.join(LOG_DIR, "adminchange.txt")
 
 def log_admin_change(action_type: str, target_id: str, before_data: dict, after_data: dict):
-    now = datetime.now()
+    now = datetime.utcnow()
+    
+    # 1. Write to local text file (Existing behavior)
     log_entry = f"""------------------------------------
 {now.strftime("%Y-%m-%d %H:%M:%S")}
 ------------------------------------
@@ -25,6 +26,25 @@ AFTER     : {after_data}
 """
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(log_entry)
+
+    # 2. Save structured record into MongoDB admin_activity_logs collection
+    try:
+        db = get_db()
+        db.admin_activity_logs.insert_one({
+            "email": "admin@gitaverse.com",  # Can be mapped dynamically if user context is passed
+            "action": action_type,
+            "target_id": target_id,
+            "timestamp": now,
+            "status": "success",
+            "changes": {
+                "before": before_data,
+                "after": after_data
+            }
+        })
+    except Exception as e:
+        import traceback
+        print(f"❌ MONGODB INSERT FAILED: {e}")
+        traceback.print_exc()  # This will print the exact line and error in your terminal
 
 @router.get("/{section}")
 def get_cms_items(section: str):

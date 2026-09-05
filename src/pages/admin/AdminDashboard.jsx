@@ -1,5 +1,6 @@
 // src/pages/admin/AdminDashboard.jsx
 import React, { useState } from 'react';
+import axios from 'axios';
 import ScrollToTopButton from './ScrollToTopButton';
 
 export default function AdminDashboard({ onNavigate }) {
@@ -21,12 +22,21 @@ export default function AdminDashboard({ onNavigate }) {
     onNavigate(path);
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8000/api/admin/logout');
+    } catch (err) {
+      console.warn("Backend logout signal failed:", err);
+    }
+    onNavigate('admin-logout');
+  };
+
   return (
     <div className="p-8 text-white min-h-[85vh] max-w-4xl mx-auto relative">
       <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-800">
         <h1 className="text-3xl font-bold text-amber-500 tracking-wider">ADMIN DASHBOARD</h1>
         <button 
-          onClick={() => onNavigate('admin-logout')}
+          onClick={handleLogout}
           className="bg-red-600/80 hover:bg-red-700 text-white px-4 py-2 rounded font-bold transition text-sm cursor-pointer"
         >
           Logout
