@@ -1,10 +1,11 @@
-// src/components/story/DailyWisdomCard.jsx
+// src/components/home/DailyWisdomCard.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, BookOpen, ChevronDown, ChevronUp, Share2, Check } from 'lucide-react';
 import divineBg from '../../assets/images/divine-bg.png';
 import { shlokasData } from '../../data/shlokasData';
 import GitaAudioPlayer from '../../components/GitaAudioPlayer';
+import GujaratiAudioPlayer from '../../components/GujaratiAudioPlayer';
 import SpeechButton from '../../components/SpeechButton';
 
 export default function DailyWisdomCard() {
@@ -67,7 +68,6 @@ export default function DailyWisdomCard() {
   // Map selected language to speech synthesis language code
   const getSpeechLanguageCode = () => {
     if (selectedLang === 'hindi') return 'hi-IN';
-    if (selectedLang === 'gujarati') return 'gu-IN';
     return 'en-IN';
   };
 
@@ -128,6 +128,7 @@ export default function DailyWisdomCard() {
             <span className="text-xs font-serif text-amber-200/90 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
               {wisdom.chapterLabel}
             </span>
+
           </div>
 
           {/* Sanskrit Shloka */}
@@ -200,34 +201,42 @@ export default function DailyWisdomCard() {
                     ))}
                   </div>
 
-                  {/* Translation Box with SpeechButton */}
+                  {/* Translation Box with Pre-recorded MP3 or SpeechButton */}
                   <div className="bg-[#06040a]/60 backdrop-blur-sm p-5 rounded-2xl border border-amber-500/20 shadow-inner">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-amber-400 text-xs font-bold uppercase tracking-widest">
                         Translation ({selectedLang.toUpperCase()})
                       </h4>
-                      <SpeechButton 
-                        text={wisdom.translations[selectedLang] || wisdom.translations.english}
-                        language={getSpeechLanguageCode()}
-                        speechId={`daily-trans-${selectedLang}-${wisdom.shlokaNum}`}
-                      />
+                      {selectedLang === 'gujarati' ? (
+                        <GujaratiAudioPlayer chapter={wisdom.chapterNum} verse={wisdom.shlokaNum} type="tra" />
+                      ) : (
+                        <SpeechButton 
+                          text={wisdom.translations[selectedLang] || wisdom.translations.english}
+                          language={getSpeechLanguageCode()}
+                          speechId={`daily-trans-${selectedLang}-${wisdom.shlokaNum}`}
+                        />
+                      )}
                     </div>
                     <p className="text-amber-100/90 text-sm md:text-base leading-relaxed font-serif">
                       {wisdom.translations[selectedLang] || wisdom.translations.english}
                     </p>
                   </div>
 
-                  {/* Krishna's Insight Box with SpeechButton */}
+                  {/* Explanation Box with Pre-recorded MP3 or SpeechButton */}
                   <div className="bg-[#06040a]/60 backdrop-blur-sm p-5 rounded-2xl border border-amber-500/20 shadow-inner">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-amber-400 text-xs font-bold uppercase tracking-widest">
                         Explanation ({selectedLang.toUpperCase()})
                       </h4>
-                      <SpeechButton 
-                        text={wisdom.explanations[selectedLang] || wisdom.explanations.english}
-                        language={getSpeechLanguageCode()}
-                        speechId={`daily-exp-${selectedLang}-${wisdom.shlokaNum}`}
-                      />
+                      {selectedLang === 'gujarati' ? (
+                        <GujaratiAudioPlayer chapter={wisdom.chapterNum} verse={wisdom.shlokaNum} type="exp" />
+                      ) : (
+                        <SpeechButton 
+                          text={wisdom.explanations[selectedLang] || wisdom.explanations.english}
+                          language={getSpeechLanguageCode()}
+                          speechId={`daily-exp-${selectedLang}-${wisdom.shlokaNum}`}
+                        />
+                      )}
                     </div>
                     <p className="text-amber-200/80 text-xs md:text-sm leading-relaxed font-light">
                       {wisdom.explanations[selectedLang] || wisdom.explanations.english}

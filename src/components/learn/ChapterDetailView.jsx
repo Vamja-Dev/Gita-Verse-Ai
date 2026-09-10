@@ -5,6 +5,7 @@ import { Bookmark, AlertCircle, X, Video, ArrowUp } from 'lucide-react';
 import { shlokasData as fallbackShlokasData } from '../../data/shlokasData';
 import { chaptersData } from '../../data/chaptersData';
 import GitaAudioPlayer, { stopGlobalAudio } from '../../components/GitaAudioPlayer';
+import GujaratiAudioPlayer, { stopGlobalGujaratiAudio } from '../GujaratiAudioPlayer';
 import SpeechButton from '../../components/SpeechButton';
 import { stopSpeaking } from '../../hooks/speech';
 
@@ -65,6 +66,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     // Stop any playing audio if the user switches chapters or leaves the view
     const handleBackClick = () => {
         stopGlobalAudio();
+        stopGlobalGujaratiAudio();
         stopSpeaking();
         onBack();
     };
@@ -72,6 +74,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     // Helper to close modal, stop audio, and return directly to the dashboard
     const handleCloseModal = () => {
         stopGlobalAudio();
+        stopGlobalGujaratiAudio();
         stopSpeaking();
         setSelectedShloka(null);
         setActiveExampleTab('1'); // Reset tab on close
@@ -128,6 +131,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
     useEffect(() => {
         return () => {
             stopSpeaking();
+            stopGlobalGujaratiAudio();
             if (videoRef.current) {
                 videoRef.current.pause();
             }
@@ -548,11 +552,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                         <div className="p-3.5 rounded-lg bg-[#ecd0a8]/40 border border-[#8c5a3c]/30">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati</span>
-                                                <SpeechButton 
-                                                    text={selectedShloka.translations.gujarati} 
-                                                    language="gu-IN" 
-                                                    speechId={`trans-gu-${selectedShloka.shloka_number}`} 
-                                                />
+                                                <GujaratiAudioPlayer chapter={chapterNumber} verse={selectedShloka.shloka_number} type="tra" />
                                             </div>
                                             <p className="text-[#3d2314]">{selectedShloka.translations.gujarati}</p>
                                         </div>
@@ -588,11 +588,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                         <div className="p-4 rounded-lg bg-[#e3bc8e]/50 border border-[#8c5a3c]/40 space-y-1">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="text-xs text-[#7c4a2b] font-sans font-bold">Gujarati Explanation</span>
-                                                <SpeechButton 
-                                                    text={selectedShloka.explanations?.gujarati} 
-                                                    language="gu-IN" 
-                                                    speechId={`exp-gu-${selectedShloka.shloka_number}`} 
-                                                />
+                                                <GujaratiAudioPlayer chapter={chapterNumber} verse={selectedShloka.shloka_number} type="exp" />
                                             </div>
                                             <p className="text-[#2c1810] text-sm leading-relaxed">{selectedShloka.explanations?.gujarati}</p>
                                         </div>
@@ -662,11 +658,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                                     <span className="text-xs text-[#3d2314] font-sans font-bold uppercase tracking-wide">
                                                         Example {activeExampleTab} • Gujarati (ગુજરાતી)
                                                     </span>
-                                                    <SpeechButton 
-                                                        text={selectedShloka.real_life_example[activeExampleTab].gujarati} 
-                                                        language="gu-IN" 
-                                                        speechId={`exl-gu-${selectedShloka.shloka_number}-${activeExampleTab}`} 
-                                                    />
+                                                    <GujaratiAudioPlayer chapter={chapterNumber} verse={selectedShloka.shloka_number} type={`rex${activeExampleTab}`} />
                                                 </div>
                                                 <p className="text-[#2c1810] text-sm leading-relaxed font-serif">
                                                     {selectedShloka.real_life_example[activeExampleTab].gujarati}
@@ -676,7 +668,7 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                                     )}
                                 </div>
 
-                                {/* Floating "Go to Top" button styled with the exact same theme and colors, placed on the bottom right inside the scroll body */}
+                                {/* Floating "Go to Top" button */}
                                 {showScrollTop && (
                                     <div className="sticky bottom-4 z-50 flex justify-end pr-0 -mr-13 pointer-events-none">
                                         <motion.button
@@ -697,10 +689,6 @@ export default function ChapterDetailView({ chapterNumber, onBack, backgroundIma
                             <div className="relative -mt-3 h-14 md:h-16 bg-gradient-to-t from-[#2d1508] via-[#8c5a3c] to-[#1a0c04] border-2 border-[#0a0401] rounded-full shadow-[0_-15px_30px_rgba(0,0,0,0.95)] flex justify-between items-center z-30 px-2 w-[calc(100%+5rem)] md:w-[calc(100%+7rem)]">
                                 <div className="flex items-center -ml-8 md:-ml-10 pointer-events-none">
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-l border border-black" />
-                                    <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-[#5c3a21] to-[#8c5a3c] rounded-full border-2 border-black shadow-2xl transform rotate-12" />
-                                </div>
-                                <div className="h-3 w-full mx-6 bg-gradient-to-t from-black/70 via-transparent to-white/40 rounded-full" />
-                                <div className="flex items-center -mr-8 md:-mr-10 pointer-events-none">
                                     <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-l from-[#5c3a21] to-[#8c5a3c] rounded-full border-2 border-black shadow-2xl transform -rotate-12" />
                                     <div className="w-4 h-6 bg-[#3d200f] rounded-r border border-black" />
                                 </div>
