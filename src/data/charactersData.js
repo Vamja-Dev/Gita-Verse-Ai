@@ -35,7 +35,7 @@ export const charactersData = [
   {
     id: 'ganesha',
     name: "God Ganesha",
-    sanskritName: "भगवान गणेश",
+    sanskritName: "श्रीगणेश",
     title: "The Remover of Obstacles & Scribe",
     faction: "DIVINE",
     description: "The elephant-headed deity of wisdom who traditionally wrote down the Mahabharata as sage Vyasa dictated it.",
@@ -246,10 +246,10 @@ export const charactersData = [
   },
   {
     id: 'subhadra',
-    name: "Subhadra",
+    name: "Goddess Subhadra",
     sanskritName: "सुभद्रा",
     title: "Princess of Dwarka",
-    faction: "PANDAVA",
+    faction: "DIVINE",
     description: "Krishna’s sister, Arjuna's wife, and the mother of the fearless hero Abhimanyu.",
     highlights: [
       "Beloved sister of God Krishna and God Balarama",
