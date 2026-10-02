@@ -9,7 +9,9 @@ let globalSetStateCallback = null;
 
 export default function GitaAudioPlayer({ shlokaId }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioUrl = `/audio/${shlokaId}.wav`;
+  // Converts "ch-2-65" into "2_65" to match your actual filename convention (e.g., 2_65.wav)
+  const cleanId = shlokaId ? shlokaId.replace('ch-', '').replace('-', '_') : '';
+  const audioUrl = `/audio/${cleanId}.wav`;
 
   useEffect(() => {
     return () => {
